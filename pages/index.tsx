@@ -1,6 +1,6 @@
 import { Container, Grid } from "@mui/material";
 import Head from "next/head";
-import { getAllProducts } from "../api/product";
+import { getAllProducts } from "../apis/product";
 import { ProductCard } from "../components";
 import { DefaultLayout } from "../layouts";
 import styles from "../styles/Home.module.css";

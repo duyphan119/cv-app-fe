@@ -1,7 +1,7 @@
 import { Container } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { getAllProducts } from "../../api/product";
+import { getAllProducts } from "../../apis/product";
 import { ProductInfo } from "../../components";
 import { getListProducts } from "../../dummyData";
 import { DefaultLayout } from "../../layouts";

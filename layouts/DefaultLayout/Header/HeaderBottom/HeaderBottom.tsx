@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import { getAllGroupProducts } from "../../../../api/groupProduct";
+import { getAllGroupProducts } from "../../../../apis/groupProduct";
 import { MSG_SUCCESS } from "../../../../utils/constants";
 import { GroupProduct } from "../../../../utils/types";
 import styles from "./style.module.css";

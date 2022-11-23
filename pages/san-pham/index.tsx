@@ -1,7 +1,7 @@
 import { Grid, Pagination } from "@mui/material";
 import Head from "next/head";
 import React from "react";
-import { getAllProducts } from "../../api/product";
+import { getAllProducts } from "../../apis/product";
 import { ProductCard } from "../../components";
 import { getListProducts } from "../../dummyData";
 import { ProductsLayout } from "../../layouts";

@@ -6,7 +6,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import {
   ChangeProfile,
   changeProfile as apiChangeProfile,
-} from "../../api/auth";
+} from "../../apis/auth";
 import styles from "../../styles/Profile.module.css";
 import { MSG_SUCCESS } from "../../utils/constants";
 import { useSnackbarContext } from "../../context/SnackbarContext";

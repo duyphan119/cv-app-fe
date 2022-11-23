@@ -1,5 +1,5 @@
 import React from "react";
-import { login, Login } from "../../../api/auth";
+import { login, Login } from "../../../apis/auth";
 import { useForm, SubmitHandler } from "react-hook-form";
 import styles from "../style.module.css";
 import { useAuthContext } from "../../../context/AuthContext";

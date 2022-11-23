@@ -1,7 +1,7 @@
 import axios from "axios";
 import { BASE_URL, MSG_SUCCESS } from "../utils/constants";
 import jwtDecode from "jwt-decode";
-import { refreshToken } from "../api/auth";
+import { refreshToken } from "../apis/auth";
 
 export const publicAxios = () => {
   const instance = axios.create({ withCredentials: true, baseURL: BASE_URL });
