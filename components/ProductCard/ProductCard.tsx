@@ -100,7 +100,7 @@ const ProductCard = (props: Props) => {
         >
           <Image
             src={
-              selected
+              selected && props.product.images
                 ? props.product.images.find(
                     (img: ProductVariantImage) =>
                       selected.findIndex(
