@@ -1,0 +1,34 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+.header-menu {
+  position: relative;
+  width: 160px;
+}
+.header-menu-selected {
+  box-shadow: 0 0 1px 0 gray;
+}
+.header-menu-selected,
+.header-menu-items li {
+  padding: 8px;
+  cursor: pointer;
+}
+.header-menu-items {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 1px);
+  width: 160px;
+  z-index: 1;
+  background-color: #fff;
+}
+.header-menu-items li {
+  white-space: nowrap;
+}
