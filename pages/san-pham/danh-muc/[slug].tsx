@@ -9,7 +9,7 @@ const ProductDetail = (props: Props) => {
   const router = useRouter();
   const { slug } = router.query;
   return (
-    <ProductsLayout>
+    <ProductsLayout totalProducts={12}>
       <>
         <Head>
           <title>Tất cả sản phẩm</title>
