@@ -15,7 +15,7 @@ const Products = (props: ProductsProps) => {
       {props.products?.map((product) => {
         return (
           <Grid item xs={12} sm={6} lg={4} key={Math.random() + ""}>
-            <ProductCard product={product} />
+            {/* <ProductCard product={product} /> */}
           </Grid>
         );
       })}
