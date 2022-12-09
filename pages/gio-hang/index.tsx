@@ -30,6 +30,9 @@ const CartItem = React.memo((props: CartItemProps) => {
     <tr>
       <td>
         <div className={styles["td-product"]}>
+          <IconButton color="error" onClick={handleDeleteItem}>
+            <DeleteOutlineIcon />
+          </IconButton>
           <div>
             <Image
               width={72}
@@ -60,28 +63,27 @@ const CartItem = React.memo((props: CartItemProps) => {
       </td>
       <td>{props.item.productVariant.price}</td>
       <td>
-        <div className={styles.quantity}>
-          <button
-            className={styles.inc}
-            onClick={() => handleUpdateItem(props.item.quantity - 1)}
-          >
-            -
-          </button>
-          {props.item.quantity}
-          <button
-            className={styles.desc}
-            onClick={() => handleUpdateItem(props.item.quantity + 1)}
-          >
-            +
-          </button>
+        <div className={styles["quantity-wrapper"]}>
+          <div>{props.item.productVariant.price}</div>
+          <div className={styles.quantity}>
+            <button
+              className={styles.inc}
+              onClick={() => handleUpdateItem(props.item.quantity - 1)}
+            >
+              -
+            </button>
+            {props.item.quantity}
+            <button
+              className={styles.desc}
+              onClick={() => handleUpdateItem(props.item.quantity + 1)}
+            >
+              +
+            </button>
+          </div>
+          <div>{props.item.quantity * props.item.productVariant.price}</div>
         </div>
       </td>
       <td>{props.item.quantity * props.item.productVariant.price}</td>
-      <td>
-        <IconButton color="error" onClick={handleDeleteItem}>
-          <DeleteOutlineIcon />
-        </IconButton>
-      </td>
     </tr>
   );
 });
@@ -96,7 +98,6 @@ const TableCart = () => {
           <th>Giá</th>
           <th>Số lượng</th>
           <th>Tổng</th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -104,14 +105,15 @@ const TableCart = () => {
           return <CartItem key={item.productVariant.id} item={item} />;
         })}
         <tr>
-          <td colSpan={3}>
-            <div className={styles.coupon}>
-              <input placeholder="Nhập mã giảm giá" />
-              <button>Sử dụng</button>
+          <td colSpan={4}>
+            <div className={styles.last}>
+              <div className={styles.coupon}>
+                <input placeholder="Nhập mã giảm giá" />
+                <button>Sử dụng</button>
+              </div>
+              <div>Tổng: {total}đ</div>
             </div>
           </td>
-          <td>{total}</td>
-          <td></td>
         </tr>
       </tbody>
     </table>

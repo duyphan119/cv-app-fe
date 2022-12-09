@@ -28,7 +28,7 @@
   font-size: 2rem;
 }
 .price {
-  font-size: 1.8rem;
+  font-size: 18px;
   color: red;
   font-weight: 500;
 }
@@ -82,7 +82,7 @@
   background-color: inherit;
   border: none;
   padding: 16px 40px;
-  font-size: 1.8rem;
+  font-size: 18px;
   font-weight: 500;
   border: 1px solid var(--logo-bg-color);
 }

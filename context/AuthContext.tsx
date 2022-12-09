@@ -6,6 +6,8 @@ import {
   useState,
 } from "react";
 import { User } from "../utils/types";
+import { logout as apiLogout } from "../apis/auth";
+import { MSG_SUCCESS } from "../utils/constants";
 
 const AuthContext = createContext<any>({});
 
@@ -21,10 +23,17 @@ const AuthWrapper = ({ children }: Props) => {
     localStorage.setItem("user", JSON.stringify(newProfile));
   };
   const login = (user: User, accessToken: string) => {
-    console.log({ user, accessToken });
-    setProfile(user);
-    localStorage.setItem("user", JSON.stringify(user));
-    localStorage.setItem("accessToken", accessToken);
+    if (accessToken && user) {
+      console.log({ user, accessToken });
+      setProfile(user);
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("accessToken", accessToken);
+    }
+  };
+  const logout = async () => {
+    setProfile(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
   };
 
   useEffect(() => {
@@ -37,6 +46,7 @@ const AuthWrapper = ({ children }: Props) => {
         profile,
         changeProfile,
         login,
+        logout,
       }}
     >
       {children}

@@ -1,13 +1,15 @@
 import Link from "next/link";
 import React from "react";
 import { getAllGroupProducts } from "../../../../apis/groupProduct";
+import { useGroupProductContext } from "../../../../context/GroupProductContext";
 import { MSG_SUCCESS } from "../../../../utils/constants";
 import { GroupProduct } from "../../../../utils/types";
 import styles from "./style.module.css";
 type Props = {};
 
 const HeaderBottom = (props: Props) => {
-  const [groupProducts, setGroupProducts] = React.useState<GroupProduct[]>([]);
+  const { groupProducts, setGroupProducts } = useGroupProductContext();
+
   React.useEffect(() => {
     (async () => {
       try {
@@ -40,7 +42,7 @@ const HeaderBottom = (props: Props) => {
                 return (
                   <li className={styles["menu-item"]} key={groupProduct.id}>
                     <Link
-                      href={`/san-pham/${groupProduct.slug}`}
+                      href={`/san-pham/danh-muc/${groupProduct.slug}`}
                       className={styles["menu-item-link"]}
                     >
                       {groupProduct.name}

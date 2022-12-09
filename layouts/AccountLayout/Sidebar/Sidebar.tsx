@@ -1,14 +1,14 @@
-import Link from "next/link";
-import React from "react";
-import styles from "./style.module.css";
-import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
-import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
-import PasswordOutlinedIcon from "@mui/icons-material/PasswordOutlined";
-import { useRouter } from "next/router";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import PasswordOutlinedIcon from "@mui/icons-material/PasswordOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { logout as apiLogout } from "../../../apis/auth";
+import { useAuthContext } from "../../../context/AuthContext";
+import styles from "./style.module.css";
 type Props = {};
 
 const items: any[] = [
@@ -33,11 +33,6 @@ const items: any[] = [
     icon: <FavoriteBorderOutlinedIcon />,
   },
   {
-    href: "/xem-gan-day",
-    label: "Xem gần đây",
-    icon: <HistoryOutlinedIcon />,
-  },
-  {
     href: "/doi-mat-khau",
     label: "Đổi mật khẩu",
     icon: <PasswordOutlinedIcon />,
@@ -46,6 +41,19 @@ const items: any[] = [
 
 const Sidebar = (props: Props) => {
   const router = useRouter();
+  const { logout } = useAuthContext();
+
+  const handleLogout = async () => {
+    console.log("click");
+    try {
+      const { message } = await apiLogout();
+      logout();
+      router.push("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <aside className={styles.sidebar}>
       <ul className={styles.list}>
@@ -64,7 +72,7 @@ const Sidebar = (props: Props) => {
             </li>
           );
         })}
-        <li className={styles.item}>
+        <li className={styles.item} onClick={handleLogout}>
           <button>
             <LogoutOutlinedIcon />
             Đăng xuất

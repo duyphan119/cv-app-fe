@@ -136,11 +136,12 @@ const ProductCard = (props: Props) => {
         </Link>
         <WishlistIcon productId={props.product.id} />
         <div className={styles.price}>
-          {/* <span className={styles["old-price"]}>{selectedProductVariant ? selectedProductVariant.price : props.product.productVariants[0].price}đ</span> */}
           <span>
             {selectedProductVariant
               ? selectedProductVariant.price
-              : props.product.productVariants[0].price}
+              : props.product.minPrice === props.product.maxPrice
+              ? props.product.minPrice
+              : `${props.product.minPrice}đ - ${props.product.maxPrice}`}
             đ
           </span>
         </div>

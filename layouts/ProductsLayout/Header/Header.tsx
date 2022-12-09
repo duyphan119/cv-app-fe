@@ -2,41 +2,42 @@ import { ClickAwayListener } from "@mui/material";
 import React, { useState } from "react";
 import styles from "../style.module.css";
 type Props = {
-  onSort?: any;
-  sortBy?: string;
-  sortType?: string;
+  onFilter?: any;
+  sort_by?: string;
+  sort_type?: string;
   totalProducts?: number;
+  query?: any;
 };
 type Item = {
   label: string;
-  sortBy: string;
-  sortType: string;
+  sort_by: string;
+  sort_type: string;
 };
 const items: Item[] = [
   {
     label: "Mặc định",
-    sortBy: "id",
-    sortType: "desc",
+    sort_by: "id",
+    sort_type: "desc",
   },
   {
     label: "Tên A-Z",
-    sortBy: "price",
-    sortType: "asc",
+    sort_by: "name",
+    sort_type: "asc",
   },
   {
     label: "Tên Z-A",
-    sortBy: "price",
-    sortType: "desc",
+    sort_by: "name",
+    sort_type: "desc",
   },
   {
     label: "Giá tăng dần",
-    sortBy: "price",
-    sortType: "asc",
+    sort_by: "price",
+    sort_type: "asc",
   },
   {
     label: "Giá giảm dần",
-    sortBy: "price",
-    sortType: "desc",
+    sort_by: "price",
+    sort_type: "desc",
   },
 ];
 
@@ -44,7 +45,9 @@ const Header = (props: Props) => {
   const [hidden, setHidden] = useState<boolean>(true);
   const [selected, setSelected] = useState<Item>(() => {
     const item = items.find(
-      (i: Item) => i.sortBy === props.sortBy && i.sortType === props.sortType
+      (i: Item) =>
+        i.sort_by === props.query.sort_by &&
+        i.sort_type === props.query.sort_type
     );
     return item ? item : items[0];
   });
@@ -53,7 +56,8 @@ const Header = (props: Props) => {
   };
   const handleClick = (item: Item) => {
     setSelected(item);
-    props.onSort && props.onSort(item.sortBy, item.sortType);
+    props.onFilter &&
+      props.onFilter({ sort_by: item.sort_by, sort_type: item.sort_type });
     setHidden(true);
   };
   return (

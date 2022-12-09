@@ -1,7 +1,5 @@
 import React from "react";
 import { useCartContext } from "../../../context/CartContext";
-import { product, variants } from "../../../dummyData";
-import { formatVariants } from "../../../utils/helpers";
 import { Product, ProductVariant, Variant } from "../../../utils/types";
 import styles from "../style.module.css";
 

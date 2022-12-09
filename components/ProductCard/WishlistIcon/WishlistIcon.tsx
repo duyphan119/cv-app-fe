@@ -3,7 +3,6 @@ import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlin
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import styles from "../style.module.css";
 import { useWishlistContext } from "../../../context/WishlistContext";
-
 type Props = {
   productId: number;
 };
@@ -13,7 +12,7 @@ const WishlistIcon = (props: Props) => {
   const [state, setState] = useState<boolean>(false);
 
   useEffect(() => {
-    setState(listId.has(props.productId));
+    setState(listId.findIndex((id: number) => id === props.productId) !== -1);
   }, [listId]);
 
   const toggleState = () => {

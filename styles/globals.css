@@ -18,12 +18,10 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
-html {
-  font-size: 62.5%;
-}
 
 body {
-  font-size: 1.6rem;
+  font-size: 16px;
+  overflow-x: hidden;
 }
 
 a {
@@ -56,16 +54,6 @@ button {
   cursor: pointer;
   outline: none;
 }
-.MuiAlert-message,
-.MuiPaper-root,
-.MuiSnackbarContent-message,
-.MuiInputBase-input {
-  font-size: 1.6rem;
-}
-.MuiButtonBase-root,
-.MuiBadge-badge {
-  font-size: 1.2rem;
-}
 .form-group {
   position: relative;
   width: 100%;
@@ -76,7 +64,7 @@ button {
   outline: none;
   border-radius: 2px;
   width: 100%;
-  font-size: 1.4rem;
+  font-size: 14px;
 }
 
 .form-control:focus {
@@ -90,7 +78,7 @@ button {
   transition: 0.25s ease;
   pointer-events: none;
   user-select: none;
-  font-size: 1.2rem;
+  font-size: 12px;
 }
 .form-error {
   position: absolute;
@@ -98,7 +86,7 @@ button {
   right: 8px;
   background-color: red;
   border-radius: 5px;
-  font-size: 1.4rem;
+  font-size: 14px;
   height: 28px;
   display: flex;
   align-items: center;
@@ -128,11 +116,73 @@ button {
   top: 0;
   padding: 0 4px;
   background-color: #fff;
-  font-size: 1.2rem;
+  font-size: 12px;
 } */
 /* .form-control:focus + .form-label {
   color: var(--logo-bg-color);
 } */
 .form-error {
   position: absolute;
+}
+.table {
+  width: 100%;
+}
+.table th,
+.table td {
+  box-shadow: 0 0 1px 0 gray;
+  padding: 8px;
+  position: relative;
+}
+.btnSearch,
+.btnSort,
+.btnAdd,
+.btnEdit,
+.btnDelete {
+  color: #fff;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+}
+.btnSort,
+.btnSearch {
+  background-color: var(--logo-bg-color);
+  box-shadow: 0 0 1px 0 var(--logo-bg-color);
+}
+.btnAdd {
+  background-color: var(--logo-bg-color);
+  box-shadow: 0 0 1px 0 var(--logo-bg-color);
+}
+.btnEdit {
+  background-color: #d1a544;
+  box-shadow: 0 0 1px 0 #d1a544;
+}
+.btnDelete {
+  background-color: #d32f2f;
+  box-shadow: 0 0 1px 0 #d32f2f;
+}
+.btnSort:disabled:hover {
+  box-shadow: unset;
+  cursor: default;
+}
+.btnSort:hover,
+.btnSearch:hover {
+  box-shadow: 0 0 1px 1px var(--logo-bg-color);
+}
+.btnAdd:hover {
+  box-shadow: 0 0 1px 1px var(--logo-bg-color);
+}
+.btnEdit:hover {
+  box-shadow: 0 0 1px 1px #d1a544;
+}
+.btnDelete:hover {
+  box-shadow: 0 0 1px 1px #d32f2f;
+}
+.ql-container {
+  border-top: 2px solid transparent !important;
+  border-bottom: 2px solid #000 !important;
+  border-left: 2px solid #000 !important;
+  border-right: 2px solid #000 !important;
+}
+.ql-toolbar {
+  border: 2px solid #000 !important;
 }

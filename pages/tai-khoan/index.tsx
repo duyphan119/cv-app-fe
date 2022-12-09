@@ -84,16 +84,17 @@ const Profile = (props: Props) => {
                 Số điện thoại không được bỏ trống
               </div>
             )}
-            {errors.phone && errors.phone.type === "minLength" && (
-              <div className="form-error">
-                Số điện thoại ít nhất có 10 chữ số
-              </div>
+            {errors.phone && errors.phone.type === "pattern" && (
+              <div className="form-error">Số điện thoại không hợp lệ</div>
             )}
             <input
               type="text"
               className="form-control required"
               defaultValue={profile.phone}
-              {...register("phone", { required: true, minLength: 10 })}
+              {...register("phone", {
+                required: true,
+                pattern: /(84|0[3|5|7|8|9])+([0-9]{8})\b/g,
+              })}
             />
             <label htmlFor="" className="form-label required">
               Số điện thoại

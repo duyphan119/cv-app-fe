@@ -47,11 +47,7 @@ const SnackbarWrapper = ({ children }: Props) => {
           key={new Date().getTime()}
           autoHideDuration={4567}
         >
-          <Alert
-            onClose={handleClose}
-            severity="success"
-            sx={{ width: "100%" }}
-          >
+          <Alert onClose={handleClose} severity={type} sx={{ width: "100%" }}>
             {text}
           </Alert>
         </Snackbar>

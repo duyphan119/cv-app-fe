@@ -35,7 +35,6 @@ const Login = (props: Props) => {
           type="text"
           id="email"
           className="form-control"
-          placeholder=" "
           autoComplete="off"
           {...register("email")}
         />
@@ -48,7 +47,6 @@ const Login = (props: Props) => {
           type="password"
           id="password"
           className="form-control"
-          placeholder=" "
           autoComplete="off"
           {...register("password")}
         />

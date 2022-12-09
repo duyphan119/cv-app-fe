@@ -18,7 +18,7 @@
 .table-cart td a {
   display: block;
   font-weight: 600;
-  font-size: 1.8rem;
+  font-size: 18px;
 }
 .table-cart td a:hover {
   color: var(--logo-bg-color);
@@ -46,12 +46,9 @@
   box-shadow: 0 0 1px 2px var(--logo-bg-color);
 }
 .table-cart svg {
-  font-size: 2.4rem;
+  font-size: 24px;
 }
-.table-cart tr th:last-child,
-.table-cart tr td:last-child {
-  width: 60px;
-}
+
 .coupon {
   text-align-last: left;
   display: flex;
@@ -79,6 +76,46 @@
   margin-left: auto;
   margin-top: 36px;
 }
+.table-cart .quantity-wrapper div:first-child,
+.table-cart .quantity-wrapper div:last-child {
+  display: none;
+}
+@media only screen and (max-width: 600px) {
+  .cart-result {
+    width: 100%;
+  }
+  .table-cart tr td:nth-child(2),
+  .table-cart th:nth-child(2),
+  .table-cart tr td:nth-child(4),
+  .table-cart th:nth-child(4) {
+    display: none;
+  }
+  .table-cart .quantity-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+  }
+  .table-cart .quantity-wrapper div:first-child,
+  .table-cart .quantity-wrapper div:last-child {
+    display: block;
+  }
+  .table-cart tr:last-child td:first-child .last {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+  .cart-result .checkout {
+    width: 100%;
+    display: block;
+    text-align: center;
+  }
+}
+.table-cart tr:last-child td:first-child .last {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 .cart-result .row {
   display: flex;
   align-items: center;
@@ -95,7 +132,7 @@
 }
 .cart-result .row:last-child span:last-child {
   font-weight: bold;
-  font-size: 1.8rem;
+  font-size: 18px;
 }
 .checkout {
   padding: 16px;
@@ -120,13 +157,13 @@
 }
 .empty p {
   font-weight: bold;
-  font-size: 3.6rem;
+  font-size: 36px;
 }
 .empty a {
   background-color: var(--logo-bg-color);
   color: #fff;
   padding: 16px 32px;
-  font-size: 1.8rem;
+  font-size: 18px;
 }
 .empty a:hover {
   box-shadow: 0 0 1px 2px var(--logo-bg-color-opacity);

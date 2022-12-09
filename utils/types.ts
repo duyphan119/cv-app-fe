@@ -2,18 +2,20 @@ export type Action = {
   payload?: any;
   type?: string;
 };
-
-export type QueryParams = {
-  sortBy?: string;
-  sortType?: string;
-  limit?: string;
-  p?: string;
+export type SortParams = {
+  sort_by?: string;
+  sort_type?: string;
 };
+export type PaginationParams = {
+  p?: string | number;
+  limit?: string | number;
+};
+export type QueryParams = SortParams & PaginationParams;
 
 type Timestamp = {
   createdAt: string;
   updatedAt: string;
-};
+} & Partial<{ deletedAt?: string }>;
 
 export type Product = {
   id: number;
@@ -21,9 +23,15 @@ export type Product = {
   slug: string;
   description: string;
   thumbnail: string;
-  images: ProductVariantImage[];
-  productVariants: ProductVariant[];
-} & Timestamp;
+  groupProductId: number;
+} & Timestamp &
+  Partial<{
+    images: ProductVariantImage[];
+    productVariants: ProductVariant[];
+    groupProduct: GroupProduct;
+    minPrice: number;
+    maxPrice: number;
+  }>;
 
 export type Variant = {
   id: number;
@@ -47,9 +55,28 @@ export type ProductVariantImage = {
   path: string;
 } & Timestamp;
 export type CartItem = {
-  productVariant: ProductVariant;
   productVariantId: number;
   quantity: number;
+} & Partial<{ productVariant: ProductVariant }>;
+export type Order = {
+  id: number;
+  province: string;
+  district: string;
+  ward: string;
+  address: string;
+  fullName: string;
+  phone: string;
+  status: "Đang xử lý" | "Đang vận chuyển" | "Vận chuyển thành công" | null;
+  paymentMethod: string;
+  shippingPrice: number;
+  userId: number;
+  couponId: number | null;
+  user: User;
+  items: OrderItem[];
+} & Timestamp;
+export type OrderItem = CartItem & {
+  price: number;
+  id: number;
 };
 export type Cart = {
   items: CartItem[];
@@ -73,4 +100,23 @@ export type GroupProduct = {
 export type ResponseItems<T> = {
   items: T[];
   count: number;
+};
+
+export type RenderVariantType = {
+  key: string;
+  values: Variant[];
+};
+
+export type Filter = {
+  p?: number;
+  sort_by?: number;
+  sort_type?: number;
+  min_price?: number;
+  max_price?: number;
+  v_ids?: string;
+  group_product_slug?: string;
+};
+export type SortState = {
+  by: string;
+  isAsc: boolean;
 };

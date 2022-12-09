@@ -1,16 +1,91 @@
 import { Container, Grid } from "@mui/material";
 import Head from "next/head";
-import styles from "../../styles/Payment.module.css";
-import { useAuthContext } from "../../context/AuthContext";
-import { useCartContext } from "../../context/CartContext";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import { checkout as apiCheckout } from "../../apis/order";
+import { useCartContext } from "../../context/CartContext";
+import provinces from "../../province.json";
+import styles from "../../styles/Payment.module.css";
+import { MSG_SUCCESS } from "../../utils/constants";
+import { Variant } from "../../utils/types";
 
 type Props = {};
 
+type Inputs = {
+  fullName: string;
+  phone: string;
+  address: string;
+  province: string;
+  district: string;
+  ward: string;
+};
+
 const Payment = (props: Props) => {
-  const { profile } = useAuthContext();
-  const { cart } = useCartContext();
+  const router = useRouter();
+  const { cart, checkout } = useCartContext();
+  const [districts, setDistricts] = useState<any>([]);
+  const [wards, setWards] = useState<any>([]);
+  const [paymentMethod, setPaymentMethod] = useState<string>("COD");
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+    setValue,
+  } = useForm<Inputs>();
+  useEffect(() => {
+    setValue("phone", cart.phone || "");
+    setValue("fullName", cart.fullName || "");
+  }, [cart]);
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    try {
+      const { message } = await apiCheckout({
+        ...data,
+        paymentMethod,
+        shippingPrice: 0,
+      });
+      if (message === MSG_SUCCESS) {
+        checkout();
+        router.push("/thanh-toan/thanh-cong");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (type === "change") {
+        if (name === "province") {
+          const { province } = value;
+          if (province !== "") {
+            setDistricts(
+              provinces.find((p: any) => p.name === province)?.districts
+            );
+            value.district = "";
+            value.ward = "";
+          }
+        }
+        if (name === "district") {
+          const { district, province } = value;
+          if (province !== "" && district !== "") {
+            const dis = provinces
+              .find((p: any) => p.name === province)
+              ?.districts.find((d: any) => d.name === district);
+            setWards(dis ? dis.wards : []);
+            value.ward = "";
+          } else {
+            console.log("ngu");
+          }
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
   return (
     <div>
       <>
@@ -20,190 +95,272 @@ const Payment = (props: Props) => {
           <link rel="icon" href="/favicon.ico" />
         </Head>
       </>
-      <Container maxWidth="lg">
-        <Grid container>
-          <Grid item xs={12} md={8}>
-            <h1>Thông tin đặt hàng</h1>
-            <Grid container>
-              <Grid item xs={12} md={6}>
-                <Grid container columnSpacing={2} rowSpacing={2}>
-                  <Grid item xs={12}>
-                    <div className="form-group">
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder=" "
-                      />
-                      <label htmlFor="" className="form-label">
-                        Họ tên
-                      </label>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <div className="form-group">
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder=" "
-                      />
-                      <label htmlFor="" className="form-label">
-                        Số điện thoại
-                      </label>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <div className="form-group">
-                      <select className="form-control" placeholder=" ">
-                        <option value="">abc</option>
-                        <option value="">abcd</option>
-                        <option value="">abcde</option>
-                      </select>
-                      <label htmlFor="" className="form-label">
-                        Tỉnh / Thành phố
-                      </label>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <div className="form-group">
-                      <select className="form-control" placeholder=" ">
-                        <option value="">abc</option>
-                        <option value="">abcd</option>
-                        <option value="">abcde</option>
-                      </select>
-                      <label htmlFor="" className="form-label">
-                        Quận / Huyện
-                      </label>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <div className="form-group">
-                      <select className="form-control" placeholder=" ">
-                        <option value="">abc</option>
-                        <option value="">abcd</option>
-                        <option value="">abcde</option>
-                      </select>
-                      <label htmlFor="" className="form-label">
-                        Phường / Xã
-                      </label>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <div className="form-group">
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder=" "
-                      />
-                      <label htmlFor="" className="form-label">
-                        Địa chỉ
-                      </label>
-                    </div>
+      <Container maxWidth="lg" sx={{ marginBlock: "24px" }}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container>
+            <Grid item xs={12} md={8}>
+              <h1>Thông tin đặt hàng</h1>
+              <Grid container>
+                <Grid item xs={12} md={6}>
+                  <Grid container columnSpacing={2} rowSpacing={2}>
+                    <Grid item xs={12}>
+                      <div className="form-group">
+                        {errors.fullName &&
+                          errors.fullName.type === "required" && (
+                            <div className="form-error">
+                              Họ tên không được để trống
+                            </div>
+                          )}
+                        <input
+                          type="text"
+                          className="form-control"
+                          {...register("fullName", {
+                            required: true,
+                          })}
+                        />
+                        <label htmlFor="" className="form-label required">
+                          Họ tên
+                        </label>
+                      </div>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <div className="form-group">
+                        {errors.phone && errors.phone.type === "required" && (
+                          <div className="form-error">
+                            Số điện thoại không được để trống
+                          </div>
+                        )}
+                        {errors.phone && errors.phone.type === "pattern" && (
+                          <div className="form-error">
+                            Số điện thoại không hợp lệ
+                          </div>
+                        )}
+                        <input
+                          type="text"
+                          className="form-control"
+                          {...register("phone", {
+                            required: true,
+                            pattern: /(84|0[3|5|7|8|9])+([0-9]{8})\b/g,
+                          })}
+                        />
+                        <label htmlFor="" className="form-label required">
+                          Số điện thoại
+                        </label>
+                      </div>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <div className="form-group">
+                        {errors.province &&
+                          errors.province.type === "required" && (
+                            <div className="form-error">
+                              Tỉnh / Thành phố không được để trống
+                            </div>
+                          )}
+                        <select
+                          className="form-control"
+                          {...register("province", { required: true })}
+                        >
+                          <option value="">Chọn Tỉnh / Thành phố</option>
+                          {provinces.map((pro: any) => {
+                            return (
+                              <option value={pro.name} key={pro.name}>
+                                {pro.name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <label htmlFor="" className="form-label required">
+                          Tỉnh / Thành phố
+                        </label>
+                      </div>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <div className="form-group">
+                        {errors.district &&
+                          errors.district.type === "required" && (
+                            <div className="form-error">
+                              Quận / Huyện không được để trống
+                            </div>
+                          )}
+                        <select
+                          className="form-control"
+                          {...register("district", { required: true })}
+                        >
+                          <option value="">Chọn Quận / Huyện</option>
+                          {districts.map((dis: any) => {
+                            return (
+                              <option value={dis.name} key={dis.name}>
+                                {dis.name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <label htmlFor="" className="form-label required">
+                          Quận / Huyện
+                        </label>
+                      </div>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <div className="form-group">
+                        {errors.ward && errors.ward.type === "required" && (
+                          <div className="form-error">
+                            Phường / Xã không được để trống
+                          </div>
+                        )}
+                        <select
+                          className="form-control"
+                          {...register("ward", { required: true })}
+                        >
+                          <option value="">Chọn Phường / Xã</option>
+                          {wards.map((w: any) => {
+                            return (
+                              <option value={w.name} key={w.name}>
+                                {w.name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        <label htmlFor="" className="form-label required">
+                          Phường / Xã
+                        </label>
+                      </div>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <div className="form-group">
+                        {errors.address &&
+                          errors.address.type === "required" && (
+                            <div className="form-error">
+                              Địa chỉ không được để trống
+                            </div>
+                          )}
+                        <input
+                          type="text"
+                          className="form-control"
+                          {...register("address", { required: true })}
+                        />
+                        <label htmlFor="" className="form-label required">
+                          Địa chỉ
+                        </label>
+                      </div>
+                    </Grid>
                   </Grid>
                 </Grid>
               </Grid>
+              <h1>Phương thức thanh toán</h1>
+              <Grid container columnSpacing={2} rowSpacing={2}>
+                <Grid item xs={12}>
+                  <div className={styles.radio}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      id="paymentMethod1"
+                      hidden
+                      defaultChecked={paymentMethod === "COD"}
+                    />
+                    <div className={styles.circle}></div>
+                    <label
+                      htmlFor="paymentMethod1"
+                      onClick={() => setPaymentMethod("COD")}
+                    >
+                      Thanh toán khi nhận hàng (COD)
+                    </label>
+                  </div>
+                </Grid>
+                <Grid item xs={12}>
+                  <div className={styles.radio}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      id="paymentMethod2"
+                      hidden
+                      defaultChecked={paymentMethod === "Momo"}
+                    />
+                    <div className={styles.circle}></div>
+                    <label
+                      htmlFor="paymentMethod2"
+                      onClick={() => setPaymentMethod("Momo")}
+                    >
+                      Thanh toán qua Momo
+                    </label>
+                  </div>
+                </Grid>
+              </Grid>
             </Grid>
-            <h1>Phương thức thanh toán</h1>
-            <Grid container columnSpacing={2} rowSpacing={2}>
-              <Grid item xs={12}>
-                <div className={styles.radio}>
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    id="paymentMethod1"
-                    hidden
-                  />
-                  <div className={styles.circle}></div>
-                  <label htmlFor="paymentMethod1">
-                    Thanh toán khi nhận hàng (COD)
-                  </label>
-                </div>
-              </Grid>
-              <Grid item xs={12}>
-                <div className={styles.radio}>
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    id="paymentMethod2"
-                    hidden
-                  />
-                  <div className={styles.circle}></div>
-                  <label htmlFor="paymentMethod2">Thanh toán qua Momo</label>
-                </div>
-              </Grid>
+            <Grid item xs={12} md={4}>
+              <h1>Đơn hàng</h1>
+              <ul className={styles.items}>
+                {cart.items.map((item: any) => {
+                  return (
+                    <li key={item.productVariant.id} className={styles.item}>
+                      <div className={styles.start}>
+                        <Image
+                          width={64}
+                          height={64}
+                          priority={true}
+                          alt=""
+                          src={item.productVariant.product.thumbnail}
+                        />
+                      </div>
+                      <div className={styles.center}>
+                        <div className={styles.name}>
+                          {item.productVariant.product.name}
+                        </div>
+                        <div className={styles.variants}>
+                          {item.productVariant.variants.map(
+                            (variant: Variant) => {
+                              return (
+                                <div key={variant.id}>
+                                  {variant.type}: {variant.name}
+                                </div>
+                              );
+                            }
+                          )}
+                        </div>
+                      </div>
+                      <div className={styles.right}>
+                        <div>{item.productVariant.price}</div>
+                        <div>x{item.quantity}</div>
+                        <div className={styles.total}>
+                          {item.productVariant.price * item.quantity}
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+                <li className={styles["first-row"]}>
+                  <span>Giá gốc</span>
+                  <span>
+                    {cart.items.reduce(
+                      (p: number, c: any) =>
+                        p + c.productVariant.price * c.quantity,
+                      0
+                    )}
+                    đ
+                  </span>
+                </li>
+                <li className={styles.row}>
+                  <span>Giảm giá</span>
+                  <span>0đ</span>
+                </li>
+                <li className={styles["last-row"]}>
+                  <span>Tổng cộng</span>
+                  <span>
+                    {cart.items.reduce(
+                      (p: number, c: any) =>
+                        p + c.productVariant.price * c.quantity,
+                      0
+                    )}
+                    đ
+                  </span>
+                </li>
+                <li className={styles.actions}>
+                  <Link href="/gio-hang">Quay lại giỏ hàng</Link>
+                  <button type="submit">Thanh toán</button>
+                </li>
+              </ul>
             </Grid>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <h1>Đơn hàng</h1>
-            <ul className={styles.items}>
-              {cart.items.map((item: any) => {
-                return (
-                  <li key={item.productVariant.id} className={styles.item}>
-                    <div className={styles.start}>
-                      <Image
-                        width={64}
-                        height={64}
-                        priority={true}
-                        alt=""
-                        src={item.productVariant.product.thumbnail}
-                      />
-                    </div>
-                    <div className={styles.center}>
-                      <div className={styles.name}>
-                        {item.productVariant.product.name}
-                      </div>
-                      <div className={styles.variants}>
-                        {item.productVariant.variants.map((variant: any) => {
-                          return (
-                            <div key={variant.id}>
-                              {variant.type}: {variant.name}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                    <div className={styles.right}>
-                      <div>{item.productVariant.product.price}</div>
-                      <div>x{item.quantity}</div>
-                      <div className={styles.total}>
-                        {item.productVariant.product.price * item.quantity}
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-              <li className={styles["first-row"]}>
-                <span>Giá gốc</span>
-                <span>
-                  {cart.items.reduce(
-                    (p: number, c: any) =>
-                      p + c.productVariant.product.price * c.quantity,
-                    0
-                  )}
-                  đ
-                </span>
-              </li>
-              <li className={styles.row}>
-                <span>Giảm giá</span>
-                <span>0đ</span>
-              </li>
-              <li className={styles["last-row"]}>
-                <span>Tổng cộng</span>
-                <span>
-                  {cart.items.reduce(
-                    (p: number, c: any) =>
-                      p + c.productVariant.product.price * c.quantity,
-                    0
-                  )}
-                  đ
-                </span>
-              </li>
-              <li className={styles.actions}>
-                <Link href="/gio-hang">Quay lại giỏ hàng</Link>
-                <button>Thanh toán</button>
-              </li>
-            </ul>
-          </Grid>
-        </Grid>
+        </form>
       </Container>
     </div>
   );

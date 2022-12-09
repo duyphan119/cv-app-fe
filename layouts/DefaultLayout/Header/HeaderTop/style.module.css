@@ -16,7 +16,7 @@
   gap: 8px;
   color: #fff;
   padding: 16px 0;
-  font-size: 2.2rem;
+  font-size: 22px;
   margin-left: 16px;
   outline: none;
 }
@@ -35,9 +35,10 @@
   padding: 0 16px;
   min-width: 320px;
   border-radius: 2px;
+  position: relative;
 }
 .right .search svg {
-  font-size: 2.8rem;
+  font-size: 28px;
 }
 .right .search input {
   background-color: inherit;
@@ -46,7 +47,42 @@
   padding: 16px 0;
   flex: 1;
   color: inherit;
-  font-size: 1.4rem;
+  font-size: 14px;
+}
+.search-result-wrapper {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background-color: #fff;
+}
+.search-result-wrapper ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+}
+.search-result-wrapper ul .link {
+  display: flex;
+  gap: 8px;
+}
+.search-result-wrapper ul .link .product {
+  flex: 1;
+}
+.search-result-wrapper ul .link .product .price {
+  color: red;
+}
+.search-result-wrapper .view-all:hover,
+.search-result-wrapper ul .link:hover .name {
+  color: var(--logo-bg-color);
+}
+.search-result-wrapper .view-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid lightgray;
+  padding: 8px;
 }
 .right .items {
   display: flex;
@@ -59,8 +95,12 @@
   white-space: nowrap;
 }
 .right .items .item svg {
-  font-size: 3.6rem;
+  font-size: 36px;
 }
+.right .items .item span {
+  cursor: pointer;
+}
+.right .items .item span,
 .right .items .item a {
   display: flex;
   flex-direction: column;
@@ -93,7 +133,7 @@
   .logo img {
     width: 32px;
     height: 32px;
-    font-size: 1.8rem;
+    font-size: 18px;
   }
   .menu-icon {
     display: block;
@@ -103,7 +143,7 @@
     padding: 12px;
   }
   .menu-icon button svg {
-    font-size: 2.4rem;
+    font-size: 24px;
   }
   .right {
     width: 100%;
@@ -117,7 +157,7 @@
     padding: 0 8px;
   }
   .right .search svg {
-    font-size: 1.8rem;
+    font-size: 18px;
   }
   .right .search input {
     padding: 8px 0;
@@ -132,7 +172,7 @@
     width: 50vw;
   }
   .drawer-body a {
-    font-size: 1.6rem;
+    font-size: 16px;
   }
   .drawer-body .nav-items {
     padding: 8px 0;

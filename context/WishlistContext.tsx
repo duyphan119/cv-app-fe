@@ -1,3 +1,4 @@
+import { createKey } from "next/dist/shared/lib/router/router";
 import {
   createContext,
   useContext,
@@ -5,43 +6,64 @@ import {
   useEffect,
   useState,
 } from "react";
+import {
+  createFavoriteProduct,
+  deleteFavoriteProduct,
+  getFavoriteProducts,
+} from "../apis/product";
+import { MSG_SUCCESS } from "../utils/constants";
+import { Product } from "../utils/types";
+import { useSnackbarContext } from "./SnackbarContext";
 type Props = {
   children?: ReactNode;
 };
-const WishlistContext = createContext({
-  listId: new Set(),
-  count: 0,
-  addToWishlist: (productId: number) => {},
-  deleteItem: (productId: number) => {},
-});
+const WishlistContext = createContext({} as any);
 
 const WishlistWrapper = (props: Props) => {
-  const [listId, setListId] = useState<Set<number>>(new Set());
+  const [listId, setListId] = useState<Array<number>>([]);
+  const { show } = useSnackbarContext();
 
   useEffect(() => {
-    const set: Set<number> = new Set();
-    [1, 3, 4].forEach((item: number) => set.add(item));
-    setListId(set);
+    (async () => {
+      try {
+        const { message, data } = await getFavoriteProducts();
+        if (message === MSG_SUCCESS) {
+          setListId(data.items.map((prod: Product) => prod.id));
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    })();
   }, []);
 
-  const addToWishlist = (productId: number) => {
-    const set = listId;
-    set.add(productId);
-    setListId(set);
+  const addToWishlist = async (productId: number) => {
+    try {
+      const { message } = await createFavoriteProduct(productId);
+      if (message === MSG_SUCCESS) {
+        setListId((p) => [...p, productId]);
+        show("Sản phẩm đã được thêm vào danh sách yêu thích", "success");
+      }
+    } catch (error) {
+      console.log(error);
+      show("Đã có lỗi xảy ra, vui lòng thử lại", "error");
+    }
   };
 
-  const deleteItem = (productId: number) => {
-    const set = listId;
-    set.delete(productId);
-    setListId(set);
+  const deleteItem = async (productId: number) => {
+    try {
+      const { message } = await deleteFavoriteProduct(productId);
+      if (message === MSG_SUCCESS) {
+        setListId((p) => p.filter((id: number) => id !== productId));
+        show("Sản phẩm đã được xóa khỏi danh sách yêu thích", "success");
+      }
+    } catch (error) {
+      console.log(error);
+      show("Đã có lỗi xảy ra, vui lòng thử lại", "error");
+    }
   };
-
-  const count: number = listId.size;
 
   return (
-    <WishlistContext.Provider
-      value={{ listId, count, addToWishlist, deleteItem }}
-    >
+    <WishlistContext.Provider value={{ listId, addToWishlist, deleteItem }}>
       {props.children}
     </WishlistContext.Provider>
   );

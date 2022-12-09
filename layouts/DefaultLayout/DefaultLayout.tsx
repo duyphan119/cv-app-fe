@@ -13,7 +13,7 @@ const DefaultLayout = (props: Props) => {
     <>
       <Header />
       <div>
-        {props.children}
+        <div style={{ padding: "16px 0" }}>{props.children}</div>
         <Footer />
       </div>
     </>

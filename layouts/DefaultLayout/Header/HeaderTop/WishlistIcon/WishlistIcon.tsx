@@ -7,10 +7,10 @@ import { useWishlistContext } from "../../../../../context/WishlistContext";
 type Props = {};
 
 const WishlistIcon = (props: Props) => {
-  const { count } = useWishlistContext();
+  const { listId } = useWishlistContext();
   return (
     <>
-      <Badge badgeContent={count} color="error">
+      <Badge badgeContent={listId.length} color="error">
         <Link href="/san-pham-yeu-thich">
           <FavoriteBorderOutlinedIcon />
           YÊU THÍCH

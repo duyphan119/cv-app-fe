@@ -23,12 +23,14 @@ export const privateAxios = () => {
         if (accessToken) {
           const decoded: any = jwtDecode(accessToken);
           if (decoded.exp * 1000 < new Date().getTime()) {
-            const res = await refreshToken();
-            const { message, data } = res;
-            if (message === MSG_SUCCESS) {
-              const { accessToken: newAccessToken } = data;
-              config.headers.authorization = `Bearer ${newAccessToken}`;
-            }
+            try {
+              const res = await refreshToken();
+              const { message, data } = res;
+              if (message === MSG_SUCCESS) {
+                const { accessToken: newAccessToken } = data;
+                config.headers.authorization = `Bearer ${newAccessToken}`;
+              }
+            } catch (err) {}
           } else {
             config.headers.authorization = `Bearer ${accessToken}`;
           }
