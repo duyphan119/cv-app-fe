@@ -1,7 +1,7 @@
 import Head from "next/head";
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { login, Login } from "../../../apis/auth";
+import { login, LoginDTO } from "../../../apis/auth";
 import { useAuthContext } from "../../../context/AuthContext";
 import { DefaultLayout } from "../../../layouts";
 import { MSG_SUCCESS } from "../../../utils/constants";
@@ -16,9 +16,9 @@ const Login = (props: Props) => {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<Login>();
+  } = useForm<LoginDTO>();
   const router = useRouter();
-  const onSubmit: SubmitHandler<Login> = async (data) => {
+  const onSubmit: SubmitHandler<LoginDTO> = async (data) => {
     try {
       const { message, data: _data } = await login(data);
       if (message === MSG_SUCCESS) {

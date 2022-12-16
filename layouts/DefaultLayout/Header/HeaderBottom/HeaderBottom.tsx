@@ -13,7 +13,10 @@ const HeaderBottom = (props: Props) => {
   React.useEffect(() => {
     (async () => {
       try {
-        const res = await getAllGroupProducts();
+        const res = await getAllGroupProducts({
+          sort_by: "name",
+          sort_type: "asc",
+        });
         const { message, data } = res;
         if (message === MSG_SUCCESS) {
           setGroupProducts(data.items);

@@ -1,4 +1,4 @@
-import { Grid, Pagination } from "@mui/material";
+import { Grid, Pagination, Box } from "@mui/material";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import React from "react";
@@ -18,28 +18,31 @@ type Props = {
   productData: ResponseItems<Product>;
 };
 const LIMIT = 9;
-const ProductDetail = (props: Props) => {
+const Products = (props: Props) => {
   const { groupProducts } = useGroupProductContext();
   const router = useRouter();
   const { p } = router.query;
-  const [filter, setFilter] = React.useState<Filter>({ p: p ? +p : 1 });
+  const [filter, setFilter] = React.useState<Filter>({
+    ...router.query,
+    p: p ? +p : 1,
+  });
 
   const handleChange = (p: number) => {
     setFilter((prev) => ({ ...prev, p }));
   };
 
   const handleFilter = (f: Filter) => {
-    console.log("handleFilter: ", f);
     setFilter({ ...f, p: f.p && f.p > 1 ? 1 : f.p || 1 });
   };
 
   React.useEffect(() => {
     const paramsObj: any = {};
     Object.keys(filter).forEach((key: string) => {
-      paramsObj[key] =
-        router.query[key] && filter[key as keyof Filter] === router.query[key]
-          ? router.query[key]
-          : filter[key as keyof Filter];
+      if (key !== "group_product_slug")
+        paramsObj[key] =
+          router.query[key] && filter[key as keyof Filter] === router.query[key]
+            ? router.query[key]
+            : filter[key as keyof Filter];
     });
 
     if (paramsObj.p && paramsObj.p <= 1) {
@@ -48,10 +51,19 @@ const ProductDetail = (props: Props) => {
 
     const searchParams: string = new URLSearchParams(paramsObj).toString();
 
-    if (searchParams !== "") {
-      router.push(`${window.location.pathname}?${searchParams}`);
+    if (Object.keys(filter).length > 0 && Object.keys(paramsObj).length > 0) {
+      if (Object.keys(paramsObj).length > 0)
+        router.push(
+          `${window.location.origin}/san-pham/danh-muc/${filter.group_product_slug}?${searchParams}`
+        );
+      else
+        router.push(
+          `${window.location.origin}/san-pham/danh-muc/${filter.group_product_slug}`
+        );
     } else {
-      router.push(window.location.pathname);
+      router.push(
+        `${window.location.origin}/san-pham/danh-muc/${filter.group_product_slug}`
+      );
     }
   }, [filter]);
 
@@ -91,18 +103,26 @@ const ProductDetail = (props: Props) => {
             </Grid>
           );
         })}
-        <Grid item xs={12}>
-          <Pagination
-            count={Math.ceil(props.productData.count / LIMIT)}
-            sx={{ ul: { justifyContent: "center" } }}
-            variant="outlined"
-            shape="rounded"
-            showLastButton
-            showFirstButton
-            page={filter.p || 1}
-            onChange={(e, page) => handleChange(page)}
-          />
-        </Grid>
+        {props.productData.count > 0 ? (
+          <Grid item xs={12}>
+            <Pagination
+              count={Math.ceil(props.productData.count / LIMIT)}
+              sx={{ ul: { justifyContent: "center" } }}
+              variant="outlined"
+              shape="rounded"
+              showLastButton
+              showFirstButton
+              page={filter.p || 1}
+              onChange={(e, page) => handleChange(page)}
+            />
+          </Grid>
+        ) : (
+          <Grid item xs={12}>
+            <Box sx={{ bgcolor: "#f8bbd0", p: 2 }}>
+              Không có sản phẩm phù hợp
+            </Box>
+          </Grid>
+        )}
       </Grid>
     </ProductsLayout>
   );
@@ -138,4 +158,4 @@ export async function getServerSideProps(context: any) {
       };
 }
 
-export default ProductDetail;
+export default Products;

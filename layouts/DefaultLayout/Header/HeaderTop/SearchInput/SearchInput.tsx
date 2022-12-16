@@ -1,4 +1,4 @@
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import styles from "../style.module.css";
 import { Product, ResponseItems } from "../../../../../utils/types";
@@ -7,6 +7,7 @@ import { MSG_SUCCESS } from "../../../../../utils/constants";
 import Link from "next/link";
 import Image from "next/image";
 import { ClickAwayListener } from "@mui/material";
+import { useRouter } from "next/router";
 
 type Props = {};
 
@@ -17,6 +18,7 @@ const SearchInput = (props: Props) => {
   });
   const [q, setQ] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setQ(e.target.value);
@@ -48,6 +50,12 @@ const SearchInput = (props: Props) => {
     setVisible(true);
   };
 
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleBlur();
+    router.push(`/tim-kiem?q=${q}`);
+  };
+
   useEffect(() => {
     const timerId = setTimeout(() => {
       search();
@@ -58,7 +66,7 @@ const SearchInput = (props: Props) => {
 
   return (
     <ClickAwayListener onClickAway={handleBlur}>
-      <div className={styles.search}>
+      <form className={styles.search} onSubmit={handleSubmit}>
         <input
           type="search"
           placeholder="Nhập từ khóa cần tìm"
@@ -102,7 +110,7 @@ const SearchInput = (props: Props) => {
             </Link>
           </div>
         )}
-      </div>
+      </form>
     </ClickAwayListener>
   );
 };

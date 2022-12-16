@@ -1,3 +1,6 @@
+.main {
+  min-height: 100%;
+}
 .table-cart {
   width: 100%;
 }

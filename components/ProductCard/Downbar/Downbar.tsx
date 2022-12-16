@@ -1,11 +1,11 @@
 import React from "react";
-import { Variant } from "../../../utils/types";
+import { Variant, VariantValue } from "../../../utils/types";
 import styles from "../style.module.css";
 import Quantity from "./Quantity";
 import Variants from "./Variants";
 
 type Props = {
-  selected: Variant[];
+  selected: VariantValue[];
   onAddToCart: any;
   onClickVariant: any;
   variants: any;

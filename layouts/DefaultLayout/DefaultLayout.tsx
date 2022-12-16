@@ -10,13 +10,15 @@ type Props = {
 
 const DefaultLayout = (props: Props) => {
   return (
-    <>
+    <div
+      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+    >
       <Header />
-      <div>
-        <div style={{ padding: "16px 0" }}>{props.children}</div>
+      <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+        <div style={{ padding: "16px 0", flex: 1 }}>{props.children}</div>
         <Footer />
       </div>
-    </>
+    </div>
   );
 };
 

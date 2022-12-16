@@ -1,6 +1,7 @@
 import { Box, Modal, Tab, Tabs } from "@mui/material";
 import React from "react";
 import Login from "./Login";
+import Register from "./Register";
 import styles from "./style.module.css";
 
 type Props = {
@@ -56,7 +57,7 @@ const ModalAuth = (props: Props) => {
             <Login onClose={props.onClose} />
           </TabPanel>
           <TabPanel value={value} index={1}>
-            <Login onClose={props.onClose} />
+            <Register onClose={props.onClose} />
           </TabPanel>
         </Box>
       </Box>

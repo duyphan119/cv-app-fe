@@ -1,12 +1,18 @@
 import React from "react";
 import { useCartContext } from "../../../context/CartContext";
-import { Product, ProductVariant, Variant } from "../../../utils/types";
+import { formatProductVariants } from "../../../utils/helpers";
+import {
+  Product,
+  ProductVariant,
+  Variant,
+  VariantValue,
+} from "../../../utils/types";
 import styles from "../style.module.css";
 
 type Props = {
   product?: Product;
-  selectedVariants?: Variant[];
-  onClickVariant?: any;
+  selectedVariantValues?: VariantValue[];
+  onClickVariantValue?: any;
 };
 
 const Right = (props: Props) => {
@@ -21,43 +27,28 @@ const Right = (props: Props) => {
 
   React.useEffect(() => {
     if (props.product) {
-      let _variants: any = {};
-      props.product.productVariants[0].variants.forEach((v: Variant) => {
-        _variants = Object.assign(_variants, { [v.type]: [v] });
-      });
-      for (let i = 1; i < props.product.productVariants.length; i++) {
-        props.product.productVariants[i].variants.forEach((v: Variant) => {
-          _variants[v.type] = [
-            ..._variants[v.type].filter((_v: Variant) => _v.id !== v.id),
-            v,
-          ];
-        });
-      }
-      setVariants({
-        keys: Object.keys(_variants),
-        values: _variants,
-      });
+      setVariants(formatProductVariants(props.product));
     }
   }, [props.product]);
 
   React.useEffect(() => {
     if (
-      props.selectedVariants &&
-      props.selectedVariants.length === variants.keys.length
+      props.selectedVariantValues &&
+      props.selectedVariantValues.length === variants.keys.length
     ) {
       setSelectedProductVariant(
-        props.product?.productVariants.find((pv: ProductVariant) =>
-          pv.variants.every(
-            (v: Variant) =>
-              props.selectedVariants &&
-              props.selectedVariants.findIndex(
-                (_v: Variant) => v.id === _v.id
+        props.product?.productVariants?.find((pv: ProductVariant) =>
+          pv.variantValues.every(
+            (vv: VariantValue) =>
+              props.selectedVariantValues &&
+              props.selectedVariantValues.findIndex(
+                (_vv: VariantValue) => vv.id === _vv.id
               ) !== -1
           )
         )
       );
     }
-  }, [props.selectedVariants]);
+  }, [props.selectedVariantValues]);
 
   const handleAddToCart = () => {
     if (selectedProductVariant)
@@ -75,28 +66,28 @@ const Right = (props: Props) => {
       <div className={styles.name}>{props.product.name}</div>
       <div className={styles.price}>
         99000đ
-        <span>{props.product.productVariants[0].price}đ</span>
+        {/* <span>{props.product.productVariants[0].price}đ</span> */}
       </div>
       {variants.keys.map((key: string) => {
         return (
           <div className={styles["variant-type"]} key={key}>
             <div className={styles.title}>{key}</div>
             <ul className={styles.variant}>
-              {variants.values[key].map((variant: Variant) => {
+              {variants.values[key].map((variantValue: VariantValue) => {
                 return (
                   <li
-                    key={variant.id}
-                    onClick={() => props.onClickVariant(variant)}
+                    key={variantValue.id}
+                    onClick={() => props.onClickVariantValue(variantValue)}
                     className={
-                      props.selectedVariants &&
-                      props.selectedVariants.findIndex(
-                        (i: Variant) => i.name === variant.name
+                      props.selectedVariantValues &&
+                      props.selectedVariantValues.findIndex(
+                        (i: VariantValue) => i.id === variantValue.id
                       ) !== -1
                         ? styles.active
                         : ""
                     }
                   >
-                    {variant.name}
+                    {variantValue.value}
                   </li>
                 );
               })}

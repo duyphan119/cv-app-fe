@@ -3,11 +3,3 @@
   align-items: center;
   justify-content: center;
 }
-.h1::before {
-  content: "--------------";
-  margin-right: 8px;
-}
-.h1::after {
-  content: "--------------";
-  margin-left: 8px;
-}

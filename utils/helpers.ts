@@ -1,18 +1,61 @@
-import { RenderVariantType, Variant } from "./types";
+import {
+  OrderItem,
+  Product,
+  ProductVariantImage,
+  RenderVariantValues,
+  Variant,
+  VariantValue,
+} from "./types";
 
-export const formatVariants = (variants: Variant[]): RenderVariantType[] => {
-  const result: any = {};
-  const keys: string[] = [];
-  variants.forEach((variant: Variant) => {
-    if (result[variant.type]) {
-      result[variant.type].push(variant);
-    } else {
-      keys.push(variant.type);
-      result[variant.type] = [variant];
+export const formatVariants = (
+  variantValues: VariantValue[]
+): RenderVariantValues => {
+  let result: any = {};
+  variantValues.forEach((variantValue: VariantValue) => {
+    if (variantValue.variant) {
+      if (result[variantValue.variant.name]) {
+        result[variantValue.variant.name].push(variantValue);
+      } else {
+        result[variantValue.variant.name] = [variantValue];
+      }
     }
   });
+  return {
+    keys: Object.keys(result),
+    values: result,
+  };
+};
 
-  return keys.map((key: string) => ({ key, values: result[key] }));
+export const formatProductVariants = (
+  product: Product
+): RenderVariantValues => {
+  let _variants: any = {};
+  if (product.productVariants) {
+    product.productVariants[0].variantValues.forEach((vv: VariantValue) => {
+      if (vv.variant) {
+        _variants = Object.assign(_variants, { [vv.variant.name]: [vv] });
+      }
+    });
+    for (let i = 1; i < product.productVariants.length; i++) {
+      product.productVariants[i].variantValues.forEach((vv: VariantValue) => {
+        if (vv.variant)
+          _variants[vv.variant.name] = [
+            ..._variants[vv.variant.name].filter(
+              (_vv: VariantValue) => _vv.id !== vv.id
+            ),
+            vv,
+          ];
+      });
+    }
+  }
+  let keys = Object.keys(_variants);
+  keys.forEach((key: string) => {
+    _variants[key].sort((a: VariantValue, b: VariantValue) => a.id - b.id);
+  });
+  return {
+    keys,
+    values: _variants,
+  };
 };
 
 export const formatDate = (input: string | number | Date): string => {
@@ -38,4 +81,34 @@ export const formatTime = (input: string | number | Date): string => {
 };
 export const formatDateTime = (input: string | number | Date): string => {
   return `${formatDate(input)} ${formatTime(input)}`;
+};
+export const getPriceCartItem = (orderItem: OrderItem): number => {
+  return orderItem.productVariant
+    ? orderItem.productVariant.price
+    : orderItem.product
+    ? orderItem.product.price
+    : 0;
+};
+export const getThumbnailOrderItem = (orderItem: OrderItem): string => {
+  let pv = orderItem.productVariant;
+  let p = orderItem.product;
+  if (pv) {
+    let p = pv.product;
+    if (p) {
+      let imgs = p.images;
+      let vvs = pv.variantValues;
+      if (imgs && vvs) {
+        let img = imgs.find(
+          (pvi: ProductVariantImage) =>
+            vvs.findIndex(
+              (vv: VariantValue) => vv.id === pvi.variantValueId
+            ) !== -1
+        );
+        if (img) {
+          return img.path;
+        }
+      }
+    }
+  }
+  return p ? p.thumbnail : "";
 };

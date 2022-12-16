@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
 import { getAllVariants } from "../../../apis/variant";
+import { getAllVariantValues } from "../../../apis/variantvalue";
 import { useGroupProductContext } from "../../../context/GroupProductContext";
 import { MSG_SUCCESS } from "../../../utils/constants";
 import { formatVariants } from "../../../utils/helpers";
-import { GroupProduct, RenderVariantType, Variant } from "../../../utils/types";
+import {
+  GroupProduct,
+  RenderVariantValues,
+  Variant,
+  VariantValue,
+} from "../../../utils/types";
 import styles from "../style.module.css";
 
 type Props = {
@@ -42,15 +48,18 @@ const prices: any[] = [
 
 type Selected = {
   groupProduct?: GroupProduct;
-  variants: Variant[];
+  variantValues: VariantValue[];
   price?: Price;
 };
 
 const Sidebar = (props: Props) => {
   const { groupProducts } = useGroupProductContext();
-  const [variants, setVariants] = useState<RenderVariantType[]>([]);
+  const [variantValues, setVariantValues] = useState<RenderVariantValues>({
+    keys: [],
+    values: {},
+  });
   const [selected, setSelected] = useState<Selected>({
-    variants: [],
+    variantValues: [],
   });
 
   const clickGroupProduct = (groupProduct: GroupProduct) => {
@@ -58,7 +67,7 @@ const Sidebar = (props: Props) => {
       if (prev?.groupProduct?.id === groupProduct.id) {
         return {
           price: prev.price,
-          variants: prev.variants,
+          variantValues: prev.variantValues,
         };
       }
       return {
@@ -68,24 +77,28 @@ const Sidebar = (props: Props) => {
     });
   };
 
-  const clickVariant = (variant: Variant) => {
+  const clickVariantValue = (variantValue: VariantValue) => {
     setSelected((prev) => {
-      const index = prev.variants.findIndex(
-        (v: Variant) => v.id === variant.id
+      const index = prev.variantValues.findIndex(
+        (vv: VariantValue) => vv.id === variantValue.id
       );
 
       if (index === -1) {
         return {
           ...prev,
-          variants: [
-            ...prev.variants.filter((v: Variant) => v.id !== variant.id),
-            variant,
+          variantValues: [
+            ...prev.variantValues.filter(
+              (vv: VariantValue) => vv.id !== variantValue.id
+            ),
+            variantValue,
           ],
         };
       }
       return {
         ...prev,
-        variants: prev.variants.filter((v: Variant) => v.id !== variant.id),
+        variantValues: prev.variantValues.filter(
+          (v: VariantValue) => v.id !== variantValue.id
+        ),
       };
     });
   };
@@ -95,7 +108,7 @@ const Sidebar = (props: Props) => {
       if (prev?.price?.label === price.label) {
         return {
           groupProduct: prev.groupProduct,
-          variants: prev.variants,
+          variantValues: prev.variantValues,
         };
       }
       return {
@@ -107,7 +120,7 @@ const Sidebar = (props: Props) => {
 
   const handleClick = () => {
     if (props.onFilter) {
-      const { groupProduct, price, variants } = selected;
+      const { groupProduct, price, variantValues } = selected;
       const obj: any = {};
       if (groupProduct) {
         obj.group_product_slug = groupProduct.slug;
@@ -118,10 +131,9 @@ const Sidebar = (props: Props) => {
           obj.max_price = price.max;
         }
       }
-      if (variants.length > 0) {
-        obj.v_ids = variants.map((v: Variant) => v.id).join("-");
+      if (variantValues.length > 0) {
+        obj.v_ids = variantValues.map((vv: VariantValue) => vv.id).join("-");
       }
-      console.log(obj);
       props.onFilter(obj);
       props.onClose && props.onClose();
     }
@@ -129,33 +141,35 @@ const Sidebar = (props: Props) => {
 
   useEffect(() => {
     (async () => {
-      const { message, data } = await getAllVariants();
+      const { message, data } = await getAllVariantValues();
 
       if (message === MSG_SUCCESS) {
-        setVariants(formatVariants(data.items));
+        console.log(formatVariants(data.items));
+        setVariantValues(formatVariants(data.items));
       }
     })();
   }, []);
 
   useEffect(() => {
-    if (variants.length > 0) {
+    if (variantValues.keys.length > 0) {
       const { group_product_slug, min_price, max_price, v_ids } = props.query;
 
       const groupProduct = groupProducts.find(
         (gp: GroupProduct) =>
           group_product_slug && gp.slug === group_product_slug
       );
+
       const _p = prices.find(
         (p: Price) =>
           min_price && p.min === +min_price && max_price && p.max === +max_price
       );
-      const _variants: any = v_ids
+      const _variantValues: any = v_ids
         ? v_ids.split("-").map((id: string) => {
             let result: any;
 
-            for (let i = 0; i < variants.length; i++) {
-              const _result = variants[i].values.find(
-                (v: Variant) => v.id === +id
+            for (let i = 0; i < variantValues.keys.length; i++) {
+              const _result = variantValues.values[variantValues.keys[i]].find(
+                (vv: VariantValue) => vv.id === +id
               );
 
               if (_result) {
@@ -169,11 +183,11 @@ const Sidebar = (props: Props) => {
       const s: Selected = {
         ...(groupProduct ? { groupProduct } : {}),
         ...(_p ? { price: _p } : {}),
-        variants: _variants,
+        variantValues: _variantValues,
       };
       setSelected(s);
     }
-  }, [groupProducts, props.query, variants]);
+  }, [groupProducts, props.query, variantValues]);
 
   return (
     <div className={styles.sidebar}>
@@ -191,10 +205,13 @@ const Sidebar = (props: Props) => {
                   {selected.groupProduct.name}
                 </li>
               ) : null}
-              {selected.variants.map((variant: Variant) => {
+              {selected.variantValues.map((variantValue: VariantValue) => {
                 return (
-                  <li key={variant.id} onClick={() => clickVariant(variant)}>
-                    {variant.name}
+                  <li
+                    key={variantValue.id}
+                    onClick={() => clickVariantValue(variantValue)}
+                  >
+                    {variantValue.value}
                   </li>
                 );
               })}
@@ -234,25 +251,25 @@ const Sidebar = (props: Props) => {
           })}
         </ul>
       </div>
-      {variants.map((item: RenderVariantType) => {
+      {variantValues.keys.map((key: string) => {
         return (
-          <div className={styles.panel} key={item.key}>
-            <div className={styles.title}>{item.key}</div>
+          <div className={styles.panel} key={key}>
+            <div className={styles.title}>{key}</div>
             <ul className={styles.variants}>
-              {item.values.map((variant: Variant) => {
+              {variantValues.values[key].map((variantValue: VariantValue) => {
                 return (
                   <li
-                    key={variant.id}
+                    key={variantValue.id}
                     className={`${styles.variant} ${
-                      selected.variants.findIndex(
-                        (v: Variant) => v.id === variant.id
+                      selected.variantValues.findIndex(
+                        (vv: VariantValue) => vv.id === variantValue.id
                       ) !== -1
                         ? styles.active
                         : ""
                     }`}
-                    onClick={() => clickVariant(variant)}
+                    onClick={() => clickVariantValue(variantValue)}
                   >
-                    {variant.name}
+                    {variantValue.value}
                   </li>
                 );
               })}

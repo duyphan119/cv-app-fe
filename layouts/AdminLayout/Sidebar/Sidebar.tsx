@@ -44,16 +44,12 @@ const navItems: NavItem[] = [
     href: "",
     children: [
       {
-        href: "/admin/danh-muc-san-pham",
-        label: "Danh mục sản phẩm",
+        href: "/admin/nhom-san-pham",
+        label: "Nhóm sản phẩm",
       },
       {
         href: "/admin/san-pham",
         label: "Sản phẩm",
-      },
-      {
-        href: "/admin/hinh-anh-san-pham",
-        label: "Hình ảnh sản phẩm",
       },
     ],
   },

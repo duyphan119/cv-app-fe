@@ -1,6 +1,6 @@
 import { Button, Grid, Paper } from "@mui/material";
 import Head from "next/head";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, ChangeEvent, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { getAllGroupProducts } from "../../../apis/groupProduct";
 import { AdminLayout } from "../../../layouts";
@@ -9,21 +9,27 @@ import { GroupProduct } from "../../../utils/types";
 import { useRouter } from "next/router";
 import "react-quill/dist/quill.snow.css";
 import dynamic from "next/dynamic";
+import { privateAxios } from "../../../config/configAxios";
+import { createProduct } from "../../../apis/product";
+import { uploadSingle } from "../../../apis/upload";
 const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 type Props = {};
 
 type ProductInputs = {
   name: string;
-  productCategoryId: number;
+  groupProductId: number;
   slug: string;
   description: string;
   detail: string;
+  price: number;
+  inventory: number;
 };
 
 const AddProduct = (props: Props) => {
   const router = useRouter();
   const [detail, setDetail] = useState<string>("");
+  const [files, setFiles] = useState<FileList | null>(null);
   const [groupProducts, setGroupProducts] = useState<GroupProduct[]>([]);
   const {
     register,
@@ -33,6 +39,24 @@ const AddProduct = (props: Props) => {
   } = useForm<ProductInputs>();
   const onSubmit: SubmitHandler<ProductInputs> = async (data) => {
     try {
+      if (files) {
+        const formData = new FormData();
+        formData.append("image", files[0]);
+        const { message, data: dataImage } = await uploadSingle(formData);
+        if (message === MSG_SUCCESS) {
+          console.log("Uploaded file: ", dataImage);
+          const url = dataImage.secure_url;
+          const { message: msg } = await createProduct({
+            ...data,
+            detail,
+            groupProductId: +data.groupProductId,
+            thumbnail: url,
+          });
+          if (msg === MSG_SUCCESS) {
+            router.push("/admin/san-pham");
+          }
+        }
+      }
     } catch (error) {
       console.log(error);
     }
@@ -69,15 +93,15 @@ const AddProduct = (props: Props) => {
             <Grid container rowSpacing={3} columnSpacing={3}>
               <Grid item xs={12}>
                 <div className="form-group">
-                  {errors.productCategoryId &&
-                    errors.productCategoryId.type === "required" && (
+                  {errors.groupProductId &&
+                    errors.groupProductId.type === "required" && (
                       <div className="form-error">
                         Nhóm sản phẩm không được để trống
                       </div>
                     )}
                   <select
                     className="form-control"
-                    {...register("productCategoryId", { required: true })}
+                    {...register("groupProductId", { required: true })}
                   >
                     <option value="">Chọn nhóm sản phẩm</option>
                     {groupProducts.map((item: GroupProduct) => {
@@ -89,7 +113,7 @@ const AddProduct = (props: Props) => {
                     })}
                   </select>
                   <label
-                    htmlFor="productCategoryId"
+                    htmlFor="groupProductId"
                     className="form-label required"
                   >
                     Nhóm sản phẩm
@@ -126,6 +150,34 @@ const AddProduct = (props: Props) => {
               </Grid>
               <Grid item xs={12}>
                 <div className="form-group">
+                  <input
+                    type="number"
+                    id="price"
+                    className="form-control"
+                    autoComplete="off"
+                    {...register("price")}
+                  />
+                  <label htmlFor="price" className="form-label">
+                    Giá bán
+                  </label>
+                </div>
+              </Grid>
+              <Grid item xs={12}>
+                <div className="form-group">
+                  <input
+                    type="number"
+                    id="inventory"
+                    className="form-control"
+                    autoComplete="off"
+                    {...register("inventory")}
+                  />
+                  <label htmlFor="inventory" className="form-label">
+                    Số lượng
+                  </label>
+                </div>
+              </Grid>
+              <Grid item xs={12}>
+                <div className="form-group">
                   <textarea
                     id="description"
                     className="form-control"
@@ -145,6 +197,9 @@ const AddProduct = (props: Props) => {
                     id="thumbnail"
                     className="form-control"
                     autoComplete="off"
+                    onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                      setFiles(e.target.files)
+                    }
                   />
                   <label htmlFor="thumbnail" className="form-label">
                     Ảnh đại diện

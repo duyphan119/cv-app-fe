@@ -17,7 +17,7 @@ const Products = (props: ProductsProps) => {
       <Grid container columnSpacing={2} rowSpacing={2}>
         {props.products?.map((product) => {
           return (
-            <Grid item xs={12} sm={6} md={4} key={Math.random() + ""}>
+            <Grid item xs={12} sm={6} md={4} lg={3} key={Math.random() + ""}>
               <ProductCard product={product} />
             </Grid>
           );
@@ -117,7 +117,11 @@ export default function Home({ productData }: Props) {
   );
 }
 export async function getServerSideProps() {
-  const { data } = await getAllProducts({ limit: 18, product_variants: true });
+  const { data } = await getAllProducts({
+    limit: 18,
+    product_variants: true,
+    images: true,
+  });
   return {
     props: {
       productData: data,

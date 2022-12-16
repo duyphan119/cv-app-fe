@@ -1,5 +1,5 @@
 import Head from "next/head";
-import React from "react";
+import React, { useMemo } from "react";
 import { DefaultLayout } from "../../layouts";
 import styles from "../../styles/Cart.module.css";
 import { Container, IconButton } from "@mui/material";
@@ -8,11 +8,13 @@ import Image from "next/image";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import Link from "next/link";
 import emptyCartPng from "../../public/empty-cart.png";
+import { OrderItem, VariantValue } from "../../utils/types";
+import { getPriceCartItem, getThumbnailOrderItem } from "../../utils/helpers";
 
 type Props = {};
 
 type CartItemProps = {
-  item: any;
+  item: OrderItem;
 };
 
 const CartItem = React.memo((props: CartItemProps) => {
@@ -23,8 +25,12 @@ const CartItem = React.memo((props: CartItemProps) => {
   };
 
   const handleDeleteItem = () => {
-    deleteItem(props.item.productVariant.id);
+    deleteItem(props.item.id);
   };
+
+  const getPrice = useMemo(() => {
+    return props.item ? getPriceCartItem(props.item) : 0;
+  }, [props.item]);
 
   return (
     <tr>
@@ -39,32 +45,34 @@ const CartItem = React.memo((props: CartItemProps) => {
               height={72}
               priority={true}
               alt=""
-              src={props.item.productVariant.product.thumbnail}
+              src={props.item ? getThumbnailOrderItem(props.item) : ""}
             />
           </div>
           <div>
             <Link
               href={{
                 pathname: "/san-pham/[slug]",
-                query: { slug: props.item.productVariant.product.slug },
+                query: { slug: props.item.product?.slug },
               }}
             >
-              {props.item.productVariant.product.name}
+              {props.item.product?.name}
             </Link>
-            {props.item.productVariant.variants.map((variant: any) => {
-              return (
-                <div key={variant.id} className={styles.variant}>
-                  {variant.type}: {variant.name}
-                </div>
-              );
-            })}
+            {props.item.productVariant?.variantValues?.map(
+              (variantValue: VariantValue) => {
+                return (
+                  <div key={variantValue.id} className={styles.variant}>
+                    {variantValue?.variant?.name}: {variantValue.value}
+                  </div>
+                );
+              }
+            )}
           </div>
         </div>
       </td>
-      <td>{props.item.productVariant.price}</td>
+      <td>{getPrice}</td>
       <td>
         <div className={styles["quantity-wrapper"]}>
-          <div>{props.item.productVariant.price}</div>
+          <div>{getPrice}</div>
           <div className={styles.quantity}>
             <button
               className={styles.inc}
@@ -80,10 +88,10 @@ const CartItem = React.memo((props: CartItemProps) => {
               +
             </button>
           </div>
-          <div>{props.item.quantity * props.item.productVariant.price}</div>
+          <div>{props.item.quantity * getPrice}</div>
         </div>
       </td>
-      <td>{props.item.quantity * props.item.productVariant.price}</td>
+      <td>{props.item.quantity * getPrice}</td>
     </tr>
   );
 });
@@ -158,7 +166,7 @@ const EmptyCart = () => {
 };
 
 const Cart = (props: Props) => {
-  const { count } = useCartContext();
+  const { count, loading } = useCartContext();
   return (
     <DefaultLayout>
       <>
@@ -169,15 +177,17 @@ const Cart = (props: Props) => {
         </Head>
 
         <main className={styles.main}>
-          {count ? (
-            <Container maxWidth="lg">
-              <h1>Giỏ hàng của bạn</h1>
-              <TableCart />
-              <CartResult />
-            </Container>
-          ) : (
-            <EmptyCart />
-          )}
+          {!loading ? (
+            count ? (
+              <Container maxWidth="lg">
+                <h1>Giỏ hàng của bạn</h1>
+                <TableCart />
+                <CartResult />
+              </Container>
+            ) : (
+              <EmptyCart />
+            )
+          ) : null}
         </main>
       </>
     </DefaultLayout>

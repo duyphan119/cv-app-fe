@@ -2,7 +2,8 @@ import { privateAxios } from "../config/configAxios";
 import { CartItem, QueryParams } from "../utils/types";
 
 export type CreateCartItem = {
-  productVariantId: number;
+  productId: number;
+  productVariantId?: number;
   quantity: number;
 };
 
@@ -25,14 +26,11 @@ export type OrderQueryParams = {
 export const createCartItem = (body: CreateCartItem): Promise<any> =>
   privateAxios().post("order/cart-item", body);
 
-export const updateCartItem = (
-  productVariantId: number,
-  newQuantity: number
-): Promise<any> =>
-  privateAxios().patch("order/cart-item/" + productVariantId, { newQuantity });
+export const updateCartItem = (id: number, newQuantity: number): Promise<any> =>
+  privateAxios().patch("order/cart-item/" + id, { newQuantity });
 
-export const deleteCartItem = (productVariantId: number): Promise<any> =>
-  privateAxios().delete("order/cart-item/" + productVariantId);
+export const deleteCartItem = (id: number): Promise<any> =>
+  privateAxios().delete("order/cart-item/" + id);
 
 export const getCart = (): Promise<any> => privateAxios().get("/order/cart");
 

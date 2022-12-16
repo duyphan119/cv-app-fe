@@ -24,6 +24,9 @@
 .left {
   font-weight: 500;
   font-size: 1.8em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .searchIcon {
   font-size: 18px;

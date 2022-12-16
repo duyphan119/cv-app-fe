@@ -6,8 +6,9 @@ import {
   useState,
 } from "react";
 import { User } from "../utils/types";
-import { logout as apiLogout } from "../apis/auth";
+import { logout as apiLogout, RegisterDTO } from "../apis/auth";
 import { MSG_SUCCESS } from "../utils/constants";
+import { useSnackbarContext } from "./SnackbarContext";
 
 const AuthContext = createContext<any>({});
 
@@ -16,9 +17,11 @@ type Props = {
 };
 
 const AuthWrapper = ({ children }: Props) => {
+  const { show } = useSnackbarContext();
   const [profile, setProfile] = useState<User | null>();
+  const [isLogged, setIsLogged] = useState<boolean>(false);
 
-  const changeProfile = (newProfile: User) => {
+  const changeProfile = (newProfile: User | null) => {
     setProfile(newProfile);
     localStorage.setItem("user", JSON.stringify(newProfile));
   };
@@ -28,7 +31,11 @@ const AuthWrapper = ({ children }: Props) => {
       setProfile(user);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("accessToken", accessToken);
+      show("Đăng nhập thành công", "success");
     }
+  };
+  const register = (user: User, accessToken: string) => {
+    login(user, accessToken);
   };
   const logout = async () => {
     setProfile(null);
@@ -37,8 +44,13 @@ const AuthWrapper = ({ children }: Props) => {
   };
 
   useEffect(() => {
-    setProfile(JSON.parse(localStorage.getItem("user") || "null"));
+    const profile = JSON.parse(localStorage.getItem("user") || "null");
+    setProfile(profile);
   }, []);
+
+  useEffect(() => {
+    setIsLogged(profile ? true : false);
+  }, [profile]);
 
   return (
     <AuthContext.Provider
@@ -47,6 +59,8 @@ const AuthWrapper = ({ children }: Props) => {
         changeProfile,
         login,
         logout,
+        register,
+        isLogged,
       }}
     >
       {children}

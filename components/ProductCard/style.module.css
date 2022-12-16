@@ -5,7 +5,8 @@
   border-radius: 5px;
   box-shadow: 0 0 2px 0 gray;
   gap: 4px;
-  padding: 16px;
+  overflow: hidden;
+  /* padding: 16px; */
 }
 .card:hover {
   box-shadow: 0 0 2px 1px var(--logo-bg-color);
@@ -13,10 +14,12 @@
 .thumbnail {
   text-align: center;
   display: block;
+  position: relative;
 }
 .thumbnail-wrapper {
   position: relative;
   overflow: hidden;
+  width: 100%;
 }
 .card:hover .downbar {
   transform: translateY(0);
@@ -145,65 +148,37 @@
   display: flex;
   gap: 8px;
   color: red;
+  margin: 4px 0 12px 0;
 }
 .thumbnail {
-  display: block;
   width: 100%;
   overflow: hidden;
-  height: 420px;
+  display: block;
+  position: relative;
+  height: 300px;
 }
-
 .old-price {
   color: gray;
   font-weight: 500;
   text-decoration: line-through;
 }
-@media only screen and (max-width: 600px) {
-  .thumbnail,
-  .thumbnail img {
-    width: 416px;
-    height: 496px;
-  }
-}
-@media only screen and (min-width: 600px) and (max-width: 700px) {
-  .thumbnail,
-  .thumbnail img {
-    width: 232px;
-    height: 276px;
-  }
-}
-@media only screen and (min-width: 700px) and (max-width: 800px) {
-  .thumbnail,
-  .thumbnail img {
-    width: 286px;
-    height: 320px;
-  }
-}
-@media only screen and (min-width: 800px) and (max-width: 900px) {
-  .thumbnail,
-  .thumbnail img {
-    width: 300px;
+@media only screen and (max-width: 400px) {
+  .thumbnail {
     height: 340px;
   }
 }
-@media only screen and (min-width: 900px) and (max-width: 1000px) {
-  .thumbnail,
-  .thumbnail img {
-    width: 248px;
-    height: 294px;
+@media only screen and (min-width: 400px) and (max-width: 500px) {
+  .thumbnail {
+    height: 460px;
   }
 }
-@media only screen and (min-width: 1000px) and (max-width: 1100px) {
-  .thumbnail,
-  .thumbnail img {
-    width: 274px;
-    height: 332px;
+@media only screen and (min-width: 500px) and (max-width: 600px) {
+  .thumbnail {
+    height: 560px;
   }
 }
-@media only screen and (min-width: 1100px) and (max-width: 1200px) {
-  .thumbnail,
-  .thumbnail img {
-    width: 308px;
-    height: 352px;
+@media only screen and (min-width: 700px) and (max-width: 900px) {
+  .thumbnail {
+    height: 360px;
   }
 }

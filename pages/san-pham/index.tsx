@@ -17,23 +17,28 @@ const LIMIT = 9;
 const AllProducts = (props: Props) => {
   const router = useRouter();
   const { p } = router.query;
-  const [filter, setFilter] = React.useState<Filter>({ p: p ? +p : 1 });
+  const [filter, setFilter] = React.useState<Filter>({
+    ...router.query,
+    p: p ? +p : 1,
+  });
 
   const handleChange = (p: number) => {
     setFilter((prev) => ({ ...prev, p }));
   };
 
   const handleFilter = (f: Filter) => {
+    console.log("HandleFILTER:::::::;", f);
     setFilter({ ...f, p: f.p && f.p > 1 ? 1 : f.p || 1 });
   };
 
   React.useEffect(() => {
     const paramsObj: any = {};
     Object.keys(filter).forEach((key: string) => {
-      paramsObj[key] =
-        router.query[key] && filter[key as keyof Filter] === router.query[key]
-          ? router.query[key]
-          : filter[key as keyof Filter];
+      if (key !== "group_product_slug")
+        paramsObj[key] =
+          router.query[key] && filter[key as keyof Filter] === router.query[key]
+            ? router.query[key]
+            : filter[key as keyof Filter];
     });
 
     if (paramsObj.p && paramsObj.p <= 1) {
@@ -41,11 +46,23 @@ const AllProducts = (props: Props) => {
     }
 
     const searchParams: string = new URLSearchParams(paramsObj).toString();
-
-    if (searchParams !== "") {
-      router.push(`${window.location.pathname}?${searchParams}`);
+    if (Object.keys(filter).length > 0) {
+      if (filter.group_product_slug)
+        if (Object.keys(paramsObj).length > 0)
+          router.push(
+            `${window.location.origin}/san-pham/danh-muc/${filter.group_product_slug}?${searchParams}`
+          );
+        else
+          router.push(
+            `${window.location.origin}/san-pham/danh-muc/${filter.group_product_slug}`
+          );
+      else {
+        if (Object.keys(paramsObj).length > 0)
+          router.push(`${window.location.origin}/san-pham?${searchParams}`);
+        else router.push(`${window.location.origin}/san-pham`);
+      }
     } else {
-      router.push(window.location.pathname);
+      router.push(`${window.location.origin}/san-pham`);
     }
   }, [filter]);
   return (

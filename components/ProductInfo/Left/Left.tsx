@@ -9,6 +9,7 @@ type Props = {
 
 const Left = (props: Props) => {
   const [index, setIndex] = React.useState<number>(-1);
+  console.log(props.images);
   return (
     <div className={styles.left}>
       <div className={styles.images} style={{ height: 548 }}>

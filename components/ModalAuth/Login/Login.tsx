@@ -1,5 +1,5 @@
 import React from "react";
-import { login, Login } from "../../../apis/auth";
+import { login, LoginDTO } from "../../../apis/auth";
 import { useForm, SubmitHandler } from "react-hook-form";
 import styles from "../style.module.css";
 import { useAuthContext } from "../../../context/AuthContext";
@@ -15,8 +15,8 @@ const Login = (props: Props) => {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<Login>();
-  const onSubmit: SubmitHandler<Login> = async (data) => {
+  } = useForm<LoginDTO>();
+  const onSubmit: SubmitHandler<LoginDTO> = async (data) => {
     try {
       const res = await login(data);
       const { message, data: _data } = res;
@@ -31,26 +31,41 @@ const Login = (props: Props) => {
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <div className="form-group">
+        {errors.email && errors.email.type === "required" && (
+          <div className="form-error">Email không được để trống</div>
+        )}
+        {errors.email && errors.email.type === "pattern" && (
+          <div className="form-error">Email không hợp lệ</div>
+        )}
         <input
           type="text"
           id="email"
           className="form-control"
           autoComplete="off"
-          {...register("email")}
+          {...register("email", {
+            required: true,
+            pattern: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g,
+          })}
         />
-        <label htmlFor="email" className="form-label">
+        <label htmlFor="email" className="form-label required">
           Email
         </label>
       </div>
       <div className="form-group">
+        {errors.password && errors.password.type === "required" && (
+          <div className="form-error">Mật khẩu không được để trống</div>
+        )}
+        {errors.password && errors.password.type === "minLength" && (
+          <div className="form-error">Mật khẩu ít nhất 6 kí tự</div>
+        )}
         <input
           type="password"
           id="password"
           className="form-control"
           autoComplete="off"
-          {...register("password")}
+          {...register("password", { required: true, minLength: 6 })}
         />
-        <label htmlFor="password" className="form-label">
+        <label htmlFor="password" className="form-label required">
           Mật khẩu
         </label>
       </div>

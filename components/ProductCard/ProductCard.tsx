@@ -1,13 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useCartContext } from "../../context/CartContext";
-import { product, variants } from "../../dummyData";
+import { formatProductVariants } from "../../utils/helpers";
 import {
   Product,
   ProductVariant,
   ProductVariantImage,
-  Variant,
+  VariantValue,
 } from "../../utils/types";
 import Downbar from "./Downbar";
 import styles from "./style.module.css";
@@ -19,7 +19,7 @@ type Props = {
 
 const ProductCard = (props: Props) => {
   const { addToCart } = useCartContext();
-  const [selected, setSelected] = useState<Variant[]>([]);
+  const [selected, setSelected] = useState<VariantValue[]>([]);
   const [variants, setVariants] = useState<any>({
     keys: [],
     values: {},
@@ -27,61 +27,58 @@ const ProductCard = (props: Props) => {
   const [selectedProductVariant, setSelectedProductVariant] =
     useState<ProductVariant>();
   useEffect(() => {
-    if (props.product) {
-      let _variants: any = {};
-      props.product.productVariants[0].variants.forEach((v: Variant) => {
-        _variants = Object.assign(_variants, { [v.type]: [v] });
-      });
-      for (let i = 1; i < props.product.productVariants.length; i++) {
-        props.product.productVariants[i].variants.forEach((v: Variant) => {
-          _variants[v.type] = [
-            ..._variants[v.type].filter((_v: Variant) => _v.id !== v.id),
-            v,
-          ];
-        });
-      }
-      setVariants({
-        keys: Object.keys(_variants),
-        values: _variants,
-      });
+    if (
+      props.product &&
+      props.product.productVariants &&
+      props.product.productVariants.length > 0
+    ) {
+      setVariants(formatProductVariants(props.product));
     }
   }, [props.product]);
 
   useEffect(() => {
     if (selected.length === variants.keys.length) {
       setSelectedProductVariant(
-        props.product?.productVariants.find((pv: ProductVariant) =>
-          pv.variants.every(
-            (v: Variant) =>
-              selected.findIndex((_v: Variant) => v.id === _v.id) !== -1
+        props.product?.productVariants?.find((pv: ProductVariant) =>
+          pv.variantValues.every(
+            (vv: VariantValue) =>
+              selected.findIndex((_vv: VariantValue) => vv.id === _vv.id) !== -1
           )
         )
       );
     }
   }, [selected]);
 
-  const clickVariant = (variant: Variant) => {
+  const clickVariantValue = (variantValue: VariantValue) => {
     const newArr = [...selected];
-    const index = selected.findIndex((i: Variant) => i.type === variant.type);
-    if (index === -1) newArr.push(variant);
-    else newArr[index] = variant;
+    const index = selected.findIndex(
+      (i: VariantValue) =>
+        i.variant &&
+        variantValue.variant &&
+        i.variant.name === variantValue.variant.name
+    );
+    if (index === -1) newArr.push(variantValue);
+    else newArr[index] = variantValue;
     setSelected(newArr);
   };
 
   const handleAddToCart = (quantity: number) => {
-    if (selected.length === variants.keys.length) {
-      const productVariant = props.product?.productVariants.find(
+    if (props.product && selected.length === variants.keys.length) {
+      const productVariant = props.product?.productVariants?.find(
         (pv: ProductVariant) =>
-          pv.variants.every(
-            (v: Variant) =>
-              selected.findIndex((_v: Variant) => _v.id === v.id) !== -1
+          pv.variantValues.every(
+            (vv: VariantValue) =>
+              selected.findIndex((_vv: VariantValue) => vv.id === _vv.id) !== -1
           )
       );
       if (productVariant)
         addToCart({
           quantity,
-          productVariant,
-          productVariantId: productVariant.id,
+          ...(props.product.productVariants && productVariant
+            ? { productVariant, productVariantId: productVariant.id }
+            : {}),
+          productId: props.product.id,
+          product: props.product,
         });
     }
   };
@@ -104,21 +101,21 @@ const ProductCard = (props: Props) => {
                 ? props.product.images.find(
                     (img: ProductVariantImage) =>
                       selected.findIndex(
-                        (v: Variant) => v.id === img.variantId
+                        (vv: VariantValue) => vv.id === img.variantValueId
                       ) !== -1
                   )?.path || props.product.thumbnail
                 : props.product.thumbnail
             }
-            width={334}
-            height={420}
             alt=""
             priority={true}
+            fill={true}
+            sizes="(max-width: 768px) 1vw"
           />
         </Link>
         <Downbar
           variants={variants}
           onAddToCart={handleAddToCart}
-          onClickVariant={clickVariant}
+          onClickVariant={clickVariantValue}
           selected={selected}
         />
       </div>

@@ -10,7 +10,8 @@ import { useCartContext } from "../../context/CartContext";
 import provinces from "../../province.json";
 import styles from "../../styles/Payment.module.css";
 import { MSG_SUCCESS } from "../../utils/constants";
-import { Variant } from "../../utils/types";
+import { getPriceCartItem, getThumbnailOrderItem } from "../../utils/helpers";
+import { OrderItem, Variant, VariantValue } from "../../utils/types";
 
 type Props = {};
 
@@ -25,7 +26,7 @@ type Inputs = {
 
 const Payment = (props: Props) => {
   const router = useRouter();
-  const { cart, checkout } = useCartContext();
+  const { cart, checkout, total } = useCartContext();
   const [districts, setDistricts] = useState<any>([]);
   const [wards, setWards] = useState<any>([]);
   const [paymentMethod, setPaymentMethod] = useState<string>("COD");
@@ -289,28 +290,27 @@ const Payment = (props: Props) => {
             <Grid item xs={12} md={4}>
               <h1>Đơn hàng</h1>
               <ul className={styles.items}>
-                {cart.items.map((item: any) => {
+                {cart.items.map((item: OrderItem) => {
                   return (
-                    <li key={item.productVariant.id} className={styles.item}>
+                    <li key={item.id} className={styles.item}>
                       <div className={styles.start}>
                         <Image
                           width={64}
                           height={64}
                           priority={true}
                           alt=""
-                          src={item.productVariant.product.thumbnail}
+                          src={getThumbnailOrderItem(item)}
                         />
                       </div>
                       <div className={styles.center}>
-                        <div className={styles.name}>
-                          {item.productVariant.product.name}
-                        </div>
+                        <div className={styles.name}>{item.product?.name}</div>
                         <div className={styles.variants}>
-                          {item.productVariant.variants.map(
-                            (variant: Variant) => {
+                          {item.productVariant?.variantValues.map(
+                            (variantValue: VariantValue) => {
                               return (
-                                <div key={variant.id}>
-                                  {variant.type}: {variant.name}
+                                <div key={variantValue.id}>
+                                  {variantValue?.variant?.name}:{" "}
+                                  {variantValue.value}
                                 </div>
                               );
                             }
@@ -318,10 +318,10 @@ const Payment = (props: Props) => {
                         </div>
                       </div>
                       <div className={styles.right}>
-                        <div>{item.productVariant.price}</div>
+                        <div>{getPriceCartItem(item)}</div>
                         <div>x{item.quantity}</div>
                         <div className={styles.total}>
-                          {item.productVariant.price * item.quantity}
+                          {getPriceCartItem(item) * item.quantity}
                         </div>
                       </div>
                     </li>
@@ -329,14 +329,7 @@ const Payment = (props: Props) => {
                 })}
                 <li className={styles["first-row"]}>
                   <span>Giá gốc</span>
-                  <span>
-                    {cart.items.reduce(
-                      (p: number, c: any) =>
-                        p + c.productVariant.price * c.quantity,
-                      0
-                    )}
-                    đ
-                  </span>
+                  <span>{total}đ</span>
                 </li>
                 <li className={styles.row}>
                   <span>Giảm giá</span>
@@ -344,14 +337,7 @@ const Payment = (props: Props) => {
                 </li>
                 <li className={styles["last-row"]}>
                   <span>Tổng cộng</span>
-                  <span>
-                    {cart.items.reduce(
-                      (p: number, c: any) =>
-                        p + c.productVariant.price * c.quantity,
-                      0
-                    )}
-                    đ
-                  </span>
+                  <span>{total}đ</span>
                 </li>
                 <li className={styles.actions}>
                   <Link href="/gio-hang">Quay lại giỏ hàng</Link>

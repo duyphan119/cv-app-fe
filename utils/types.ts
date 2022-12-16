@@ -10,12 +10,16 @@ export type PaginationParams = {
   p?: string | number;
   limit?: string | number;
 };
-export type QueryParams = SortParams & PaginationParams;
+export type QueryParams = { withDeleted?: boolean } & SortParams &
+  PaginationParams;
+export type SearchQueryParams = {
+  q?: string;
+} & QueryParams;
 
 type Timestamp = {
   createdAt: string;
   updatedAt: string;
-} & Partial<{ deletedAt?: string }>;
+} & Partial<{ deletedAt?: string | null }>;
 
 export type Product = {
   id: number;
@@ -24,6 +28,10 @@ export type Product = {
   description: string;
   thumbnail: string;
   groupProductId: number;
+  isVisible: boolean;
+  price: number;
+  inventory: number;
+  detail: string;
 } & Timestamp &
   Partial<{
     images: ProductVariantImage[];
@@ -36,8 +44,14 @@ export type Product = {
 export type Variant = {
   id: number;
   name: string;
-  type: string;
+  variantValues: VariantValue[];
 } & Timestamp;
+
+export type VariantValue = {
+  id: number;
+  value: string;
+} & Timestamp &
+  Partial<{ variant: Variant }>;
 
 export type ProductVariant = {
   id: number;
@@ -45,19 +59,24 @@ export type ProductVariant = {
   price: number;
   productId: number;
   product: Product;
-  variants: Variant[];
+  name: string;
+  variantValues: VariantValue[];
 } & Timestamp;
 
 export type ProductVariantImage = {
   id: number;
   productId: number;
-  variantId: number;
+  variantValueId: number | null;
   path: string;
 } & Timestamp;
 export type CartItem = {
-  productVariantId: number;
+  productId: number;
   quantity: number;
-} & Partial<{ productVariant: ProductVariant }>;
+} & Partial<{
+  productVariant: ProductVariant;
+  productVariantId: number;
+  product: Product;
+}>;
 export type Order = {
   id: number;
   province: string;
@@ -79,7 +98,7 @@ export type OrderItem = CartItem & {
   id: number;
 };
 export type Cart = {
-  items: CartItem[];
+  items: OrderItem[];
 };
 export type User = {
   id: number;
@@ -102,9 +121,9 @@ export type ResponseItems<T> = {
   count: number;
 };
 
-export type RenderVariantType = {
-  key: string;
-  values: Variant[];
+export type RenderVariantValues = {
+  keys: string[];
+  values: FormattedVariants;
 };
 
 export type Filter = {
@@ -119,4 +138,7 @@ export type Filter = {
 export type SortState = {
   by: string;
   isAsc: boolean;
+};
+export type FormattedVariants = {
+  [key: string]: VariantValue[];
 };

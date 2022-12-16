@@ -2,9 +2,10 @@ import React from "react";
 import styles from "./style.module.css";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-import { Badge } from "@mui/material";
+import { Badge, IconButton } from "@mui/material";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import Link from "next/link";
+import MenuIcon from "@mui/icons-material/Menu";
 type Props = {
   pageTitle: string;
 };
@@ -12,7 +13,12 @@ type Props = {
 const Header = (props: Props) => {
   return (
     <header className={styles.header}>
-      <div className={styles.left}>{props.pageTitle}</div>
+      <div className={styles.left}>
+        <IconButton>
+          <MenuIcon />
+        </IconButton>
+        {props.pageTitle}
+      </div>
       <div className={styles.center}>
         <form className={styles.formSearch}>
           <SearchIcon className={styles.searchIcon} />

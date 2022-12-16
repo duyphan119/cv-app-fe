@@ -6,10 +6,15 @@ export type ChangeProfile = {
   phone: string;
 };
 
-export type Login = {
+export type LoginDTO = {
   email: string;
   password: string;
 };
+
+export type RegisterDTO = {
+  fullName: string;
+  phone: string;
+} & LoginDTO;
 
 export type ChangePassword = {
   oldPassword: string;
@@ -21,8 +26,11 @@ export const logout = (): Promise<any> => publicAxios().delete("auth/logout");
 export const changeProfile = (body: ChangeProfile): Promise<any> =>
   privateAxios().patch("auth/change-profile", body);
 
-export const login = (body: Login): Promise<any> =>
+export const login = (body: LoginDTO): Promise<any> =>
   publicAxios().post("auth/login", body);
+
+export const register = (body: RegisterDTO): Promise<any> =>
+  publicAxios().post("auth/register", body);
 
 export const refreshToken = (): Promise<any> =>
   publicAxios().patch("auth/refresh");

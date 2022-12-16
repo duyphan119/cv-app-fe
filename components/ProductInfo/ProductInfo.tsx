@@ -1,5 +1,10 @@
 import React from "react";
-import { Product, ProductVariantImage, Variant } from "../../utils/types";
+import {
+  Product,
+  ProductVariantImage,
+  Variant,
+  VariantValue,
+} from "../../utils/types";
 import Left from "./Left";
 import Right from "./Right";
 import styles from "./style.module.css";
@@ -7,16 +12,21 @@ type Props = {
   product?: Product;
 };
 const ProductInfo = (props: Props) => {
-  const [selectedVariants, setSelectedVariants] = React.useState<Variant[]>([]);
+  const [selectedVariantValues, setSelectedVariantValues] = React.useState<
+    VariantValue[]
+  >([]);
 
-  const clickVariant = (variant: Variant) => {
-    const newArr = [...selectedVariants];
-    const index = selectedVariants.findIndex(
-      (i: Variant) => i.type === variant.type
+  const clickVariantValue = (variantValue: VariantValue) => {
+    const newArr = [...selectedVariantValues];
+    const index = selectedVariantValues.findIndex(
+      (i: VariantValue) =>
+        i.variant &&
+        variantValue.variant &&
+        i.variant.name === variantValue.variant.name
     );
-    if (index === -1) newArr.push(variant);
-    else newArr[index] = variant;
-    setSelectedVariants(newArr);
+    if (index === -1) newArr.push(variantValue);
+    else newArr[index] = variantValue;
+    setSelectedVariantValues(newArr);
   };
 
   return props.product ? (
@@ -24,20 +34,21 @@ const ProductInfo = (props: Props) => {
       <Left
         thumbnail={props.product.thumbnail}
         images={
-          selectedVariants.length > 0
-            ? props.product.images.filter(
-                (i: ProductVariantImage) =>
-                  selectedVariants.findIndex(
-                    (v: Variant) => v.id === i.variantId
-                  ) !== -1
+          props.product.images
+            ? [...props.product.images].filter((i: ProductVariantImage) =>
+                selectedVariantValues.length > 0
+                  ? selectedVariantValues.findIndex(
+                      (vv: VariantValue) => vv.id === i.variantValueId
+                    ) !== -1
+                  : true
               )
-            : props.product.images
+            : []
         }
       />
       <Right
         product={props.product}
-        selectedVariants={selectedVariants}
-        onClickVariant={clickVariant}
+        selectedVariantValues={selectedVariantValues}
+        onClickVariantValue={clickVariantValue}
       />
     </div>
   ) : null;

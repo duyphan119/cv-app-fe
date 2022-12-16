@@ -1,10 +1,10 @@
 import React, { useState } from "react";
-import { Variant } from "../../../../utils/types";
+import { Variant, VariantValue } from "../../../../utils/types";
 import styles from "../../style.module.css";
 
 type Props = {
   variants: any;
-  selected: Variant[];
+  selected: VariantValue[];
   clickVariant: any;
 };
 
@@ -16,21 +16,21 @@ const Variants = (props: Props) => {
           <div className={styles["variant-type"]} key={key}>
             <div className={styles["variant-type-name"]}>{key}</div>
             <ul className={styles.variants}>
-              {props.variants.values[key].map((variant: Variant) => {
+              {props.variants.values[key].map((variantValue: VariantValue) => {
                 return (
                   <li
                     className={
                       props.selected &&
                       props.selected.findIndex(
-                        (i: any) => i.name === variant.name
+                        (i: any) => i.value === variantValue.value
                       ) !== -1
                         ? styles["variant-active"]
                         : styles.variant
                     }
-                    key={variant.id}
-                    onClick={() => props.clickVariant(variant)}
+                    key={variantValue.id}
+                    onClick={() => props.clickVariant(variantValue)}
                   >
-                    {variant.name}
+                    {variantValue.value}
                   </li>
                 );
               })}

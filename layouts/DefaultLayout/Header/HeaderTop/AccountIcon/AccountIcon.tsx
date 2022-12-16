@@ -8,20 +8,8 @@ import { MSG_SUCCESS } from "../../../../../utils/constants";
 type Props = {};
 
 const AccountIcon = (props: Props) => {
-  const { profile, changeProfile } = useAuthContext();
+  const { profile, changeProfile, isLogged } = useAuthContext();
   const [open, setOpen] = useState<boolean>(false);
-  const [isLogged, setIsLogged] = useState<boolean>();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const { message } = await getProfile();
-        setIsLogged(message === MSG_SUCCESS);
-      } catch (err) {
-        setIsLogged(false);
-      }
-    })();
-  }, []);
 
   const handleClick = async (e: any) => {
     e.preventDefault();

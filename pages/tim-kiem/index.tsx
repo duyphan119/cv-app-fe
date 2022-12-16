@@ -55,7 +55,12 @@ const Search = (props: Props) => {
 
 export async function getServerSideProps(context: any) {
   const { q } = context.query;
-  const { message, data } = await search({ q, limit: 12 });
+  const { message, data } = await search({
+    q,
+    limit: 12,
+    product_variants: true,
+    images: true,
+  });
   return {
     props: {
       productData: message === MSG_SUCCESS ? data : { items: [], count: 0 },

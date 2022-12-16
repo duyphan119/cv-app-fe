@@ -12,7 +12,7 @@ import {
   updateCartItem,
 } from "../apis/order";
 import { MSG_SUCCESS } from "../utils/constants";
-import { Cart, CartItem } from "../utils/types";
+import { Cart, CartItem, OrderItem } from "../utils/types";
 import { useSnackbarContext } from "./SnackbarContext";
 type Props = {
   children?: ReactNode;
@@ -23,6 +23,7 @@ const CartContext = createContext({} as any);
 const CartWrapper = (props: Props) => {
   const [cart, setCart] = useState<Cart>({ items: [] });
   const { show } = useSnackbarContext();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     (async () => {
@@ -31,6 +32,7 @@ const CartWrapper = (props: Props) => {
         if (message === MSG_SUCCESS) {
           setCart(data.items ? data : { ...data, items: [] });
         }
+        setLoading(false);
       } catch (error) {
         console.log("Get Cart Error", error);
       }
@@ -44,20 +46,25 @@ const CartWrapper = (props: Props) => {
   const addToCart = async (item: CartItem) => {
     try {
       const { message, data } = await createCartItem({
-        productVariantId: item.productVariantId,
+        ...(item.productVariantId
+          ? { productVariantId: item.productVariantId }
+          : {}),
         quantity: item.quantity,
+        productId: item.productId,
       });
 
       if (message === MSG_SUCCESS) {
         setCart((c: Cart) => {
           const index = c.items.findIndex(
-            (i: CartItem) => i.productVariant.id === item.productVariant.id
+            (i: OrderItem) =>
+              i.productId === item.productId &&
+              i.productVariantId === item.productVariantId
           );
 
           if (index !== -1) {
-            c.items[index].quantity += item.quantity;
+            c.items[index].quantity += data.quantity;
           } else {
-            c.items.push(item);
+            c.items.push(data);
           }
 
           return { ...c };
@@ -70,18 +77,13 @@ const CartWrapper = (props: Props) => {
     }
   };
 
-  const updateCart = async (item: CartItem) => {
+  const updateCart = async (item: OrderItem) => {
     try {
-      const { message, data } = await updateCartItem(
-        item.productVariantId,
-        item.quantity
-      );
+      const { message, data } = await updateCartItem(item.id, item.quantity);
 
       if (message === MSG_SUCCESS) {
         setCart((c: Cart) => {
-          const index = c.items.findIndex(
-            (i: CartItem) => i.productVariant.id === item.productVariant.id
-          );
+          const index = c.items.findIndex((i: OrderItem) => i.id === item.id);
 
           if (index !== -1) {
             if (item.quantity <= 0) {
@@ -99,15 +101,13 @@ const CartWrapper = (props: Props) => {
     }
   };
 
-  const deleteItem = async (productVariantId: number) => {
+  const deleteItem = async (id: number) => {
     try {
-      const { message, data } = await deleteCartItem(productVariantId);
+      const { message } = await deleteCartItem(id);
 
       if (message === MSG_SUCCESS) {
         setCart({
-          items: [...cart.items].filter(
-            (i: CartItem) => i.productVariant.id !== productVariantId
-          ),
+          items: [...cart.items].filter((i: OrderItem) => i.id !== id),
         });
         show("Sản phẩm đã được xóa khỏi giỏ hàng", "success");
       }
@@ -123,7 +123,14 @@ const CartWrapper = (props: Props) => {
 
   const total: number = cart
     ? cart.items.reduce(
-        (p: number, c: CartItem) => p + c.productVariant.price * c.quantity,
+        (p: number, c: CartItem) =>
+          p +
+          (c.productVariant
+            ? c.productVariant.price
+            : c.product
+            ? c.product.price
+            : 0) *
+            c.quantity,
         0
       )
     : 0;
@@ -138,6 +145,7 @@ const CartWrapper = (props: Props) => {
         deleteItem,
         total,
         checkout,
+        loading,
       }}
     >
       {props.children}
