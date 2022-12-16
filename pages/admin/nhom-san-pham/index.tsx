@@ -1,5 +1,9 @@
+import CheckIcon from "@mui/icons-material/Check";
+import ClearIcon from "@mui/icons-material/Clear";
 import Head from "next/head";
-import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 import {
   deleteGroupProduct,
   getAllGroupProducts,
@@ -9,12 +13,8 @@ import {
 import { ConfirmDialog, DataManagement } from "../../../components";
 import { AdminLayout } from "../../../layouts";
 import { MSG_SUCCESS } from "../../../utils/constants";
-import { GroupProduct, ResponseItems } from "../../../utils/types";
-import CheckIcon from "@mui/icons-material/Check";
-import ClearIcon from "@mui/icons-material/Clear";
-import Link from "next/link";
-import Image from "next/image";
 import { formatDateTime } from "../../../utils/helpers";
+import { GroupProduct, ResponseItems } from "../../../utils/types";
 
 type Props = {
   groupProductData: ResponseItems<GroupProduct>;
@@ -80,6 +80,10 @@ const ProductCategories = (props: Props) => {
       console.log("Delete group product error", error);
     }
   };
+
+  useEffect(() => {
+    setGroupProductData(props.groupProductData);
+  }, [props.groupProductData]);
 
   return (
     <AdminLayout pageTitle="Nhóm sản phẩm">
@@ -201,6 +205,7 @@ const ProductCategories = (props: Props) => {
 export default ProductCategories;
 
 export async function getServerSideProps(context: any) {
+  console.log(context.query);
   const { p, sort_by, sort_type } = context.query;
   const res = await getAllGroupProducts({
     p: p || 1,

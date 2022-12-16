@@ -1,9 +1,8 @@
-import React, { useState, FormEvent, CSSProperties, ReactNode } from "react";
-import { Box, Button, Pagination, Paper } from "@mui/material";
-import styles from "./style.module.css";
-import Image from "next/image";
+import { Box, Pagination, Paper } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { CSSProperties, FormEvent, memo, useState } from "react";
+import styles from "./style.module.css";
 
 type SortBy = {
   display: string;
@@ -30,18 +29,18 @@ type Props = Partial<{
 const DataManagement = (props: Props) => {
   const router = useRouter();
   const { p } = router.query;
-  const [page, setPage] = useState<number>(p ? +p : 1);
+  const PAGE = p ? +p : 1;
   const [sortBy, setSortBy] = useState<string>("");
   const [sortType, setSortType] = useState<string>("asc");
   const handleSort = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const obj: any = {
-      ...(page && page > 1 ? { p: page } : {}),
+    let obj: any = {
+      ...(PAGE && PAGE > 1 ? { p: PAGE } : {}),
       sort_by: sortBy,
       sort_type: sortType,
     };
-    const url = new URLSearchParams(obj).toString();
-    url && router.push(router.pathname + "?" + url);
+    let url = new URLSearchParams(obj).toString();
+    router.push(`${router.pathname}${url ? "?" : ""}${url}`);
   };
   const showRow = (column: Column, row: any, index: number) => {
     if (column.render) {
@@ -50,16 +49,15 @@ const DataManagement = (props: Props) => {
     if (column.key === "index") {
       return index + 1;
     }
-
     return row[column.key];
   };
   const handleChange = (p: number) => {
-    const obj: any = {
-      ...(page && page > 1 ? { p: page } : {}),
+    let obj: any = {
+      ...(p && p > 1 ? { p } : {}),
       ...(sortBy !== "" ? { sort_by: sortBy, sort_type: sortType } : {}),
     };
-    const url = new URLSearchParams(obj).toString();
-    url && router.push(router.pathname + "?" + url);
+    let url = new URLSearchParams(obj).toString();
+    router.push(`${router.pathname}${url ? "?" : ""}${url}`);
   };
   return (
     <Paper className={styles.paper}>
@@ -140,7 +138,7 @@ const DataManagement = (props: Props) => {
         </tbody>
       </table>
       <Pagination
-        page={page}
+        page={PAGE}
         count={
           props.count && props.limit ? Math.ceil(props.count / props.limit) : 0
         }
@@ -156,4 +154,4 @@ const DataManagement = (props: Props) => {
   );
 };
 
-export default DataManagement;
+export default memo(DataManagement);

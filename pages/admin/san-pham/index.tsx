@@ -4,8 +4,7 @@ import { Button } from "@mui/material";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getAllProducts } from "../../../apis/product";
 import {
   DataManagement,
@@ -16,13 +15,12 @@ import { AdminLayout } from "../../../layouts";
 import { MSG_SUCCESS } from "../../../utils/constants";
 import { formatDateTime } from "../../../utils/helpers";
 import { Product, ResponseItems } from "../../../utils/types";
+
 type Props = {
   productData: ResponseItems<Product>;
 };
 const LIMIT = 10;
 const Products = (props: Props) => {
-  const router = useRouter();
-  const { p } = router.query;
   const [openModalPVI, setModalPVI] = useState<boolean>(false);
   const [openModalPV, setModalPV] = useState<boolean>(false);
   const [product, setProduct] = useState<Product>();
@@ -51,6 +49,12 @@ const Products = (props: Props) => {
       ),
     });
   };
+  console.log(props.productData);
+
+  useEffect(() => {
+    setProductData(props.productData);
+  }, [props.productData]);
+
   return (
     <AdminLayout pageTitle="Sản phẩm">
       <>
