@@ -1,4 +1,4 @@
-export const BASE_URL = "http://localhost:8080/v1/";
+export const BASE_URL = process.env.BASE_URL;
 export const CODE_OK = 200;
 export const MSG_SUCCESS = "Success";
 export const COOKIE_ACCESSTOKEN_NAME = "accessToken";
