@@ -5,10 +5,16 @@ import React, { useEffect, useState } from "react";
 import { myOrders } from "../../apis/order";
 import { AccountLayout } from "../../layouts";
 import { MSG_SUCCESS } from "../../utils/constants";
-import { Order, OrderItem, ResponseItems, Variant } from "../../utils/types";
+import {
+  Order,
+  OrderItem,
+  ResponseItems,
+  Variant,
+  VariantValue,
+} from "../../utils/types";
 import styles from "../../styles/FollowOrder.module.css";
 import Image from "next/image";
-import { formatDateTime } from "../../utils/helpers";
+import { formatDateTime, getThumbnailOrderItem } from "../../utils/helpers";
 
 const LIMIT = 10;
 
@@ -28,26 +34,26 @@ const Item = (props: OrderItemProps) => {
       <Image
         width={100}
         height={120}
-        src={props.item.productVariant.product.thumbnail}
+        src={getThumbnailOrderItem(props.item)}
         alt="thumbnail"
         priority={true}
       />
       <div className={styles.product}>
-        <div className={styles.name}>
-          {props.item.productVariant.product.name}
-        </div>
-        {props.item.productVariant.variants.map((variant: Variant) => {
-          return (
-            <div
-              className={styles.variant}
-              key={`${props.item?.productVariantId} - ${variant.id}`}
-            >
-              {variant.type}: {variant.name}
-            </div>
-          );
-        })}
+        <div className={styles.name}>{props.item.product?.name}</div>
+        {props.item.productVariant?.variantValues?.map(
+          (variantValue: VariantValue) => {
+            return (
+              <div
+                className={styles.variantValue}
+                key={`${props.item?.productVariantId} - ${variantValue.id}`}
+              >
+                {variantValue.variant?.name}: {variantValue.value}
+              </div>
+            );
+          }
+        )}
         <div className={styles.quantity}>Số lượng: {props.item.quantity}</div>
-        <div className={styles.price}>{props.item.price}đ</div>
+        <div className={styles.price}>{props.item.price}</div>
       </div>
     </>
   ) : null;
@@ -55,7 +61,7 @@ const Item = (props: OrderItemProps) => {
 
 const MyOrder = (props: OrderProps) => {
   const total = props.order?.items.reduce(
-    (p: number, c: OrderItem) => p + c.quantity * c.productVariant.price,
+    (p: number, c: OrderItem) => p + c.quantity * c.price,
     0
   );
   return props.order ? (
@@ -76,7 +82,7 @@ const MyOrder = (props: OrderProps) => {
         <div className={styles.right}>
           <div className={styles.row}>
             <span>Giá gốc: </span>
-            <span>{total}đ</span>
+            <span>{total}</span>
           </div>
           <div className={styles.row}>
             <span>Giảm giá: </span>
@@ -84,7 +90,7 @@ const MyOrder = (props: OrderProps) => {
           </div>
           <div className={styles.row}>
             <span>Tổng cộng: </span>
-            <span>{total}đ</span>
+            <span>{total}</span>
           </div>
           <div>
             <button
@@ -163,18 +169,20 @@ const FollowOrder = (props: Props) => {
             </Grid>
           );
         })}
-        <Grid item xs={12}>
-          <Pagination
-            count={Math.ceil(orderData.count / LIMIT)}
-            sx={{ ul: { justifyContent: "center" } }}
-            variant="outlined"
-            shape="rounded"
-            showLastButton
-            showFirstButton
-            page={router.query && router.query.p ? +router.query.p : 1}
-            onChange={(e, page) => handleChange(page)}
-          />
-        </Grid>
+        {orderData.count > 0 ? (
+          <Grid item xs={12}>
+            <Pagination
+              count={Math.ceil(orderData.count / LIMIT)}
+              sx={{ ul: { justifyContent: "center" } }}
+              variant="outlined"
+              shape="rounded"
+              showLastButton
+              showFirstButton
+              page={router.query && router.query.p ? +router.query.p : 1}
+              onChange={(e, page) => handleChange(page)}
+            />
+          </Grid>
+        ) : null}
       </Grid>
     </AccountLayout>
   );

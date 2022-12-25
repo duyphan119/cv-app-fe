@@ -3,41 +3,41 @@ import React, { useState } from "react";
 import styles from "../style.module.css";
 type Props = {
   onFilter?: any;
-  sort_by?: string;
-  sort_type?: string;
+  sortBy?: string;
+  sortType?: string;
   totalProducts?: number;
   query?: any;
 };
 type Item = {
   label: string;
-  sort_by: string;
-  sort_type: string;
+  sortBy: string;
+  sortType: string;
 };
 const items: Item[] = [
   {
     label: "Mặc định",
-    sort_by: "id",
-    sort_type: "desc",
+    sortBy: "id",
+    sortType: "desc",
   },
   {
     label: "Tên A-Z",
-    sort_by: "name",
-    sort_type: "asc",
+    sortBy: "name",
+    sortType: "asc",
   },
   {
     label: "Tên Z-A",
-    sort_by: "name",
-    sort_type: "desc",
+    sortBy: "name",
+    sortType: "desc",
   },
   {
     label: "Giá tăng dần",
-    sort_by: "price",
-    sort_type: "asc",
+    sortBy: "price",
+    sortType: "asc",
   },
   {
     label: "Giá giảm dần",
-    sort_by: "price",
-    sort_type: "desc",
+    sortBy: "price",
+    sortType: "desc",
   },
 ];
 
@@ -46,8 +46,7 @@ const Header = (props: Props) => {
   const [selected, setSelected] = useState<Item>(() => {
     const item = items.find(
       (i: Item) =>
-        i.sort_by === props.query.sort_by &&
-        i.sort_type === props.query.sort_type
+        i.sortBy === props.query.sortBy && i.sortType === props.query.sortType
     );
     return item ? item : items[0];
   });
@@ -57,7 +56,7 @@ const Header = (props: Props) => {
   const handleClick = (item: Item) => {
     setSelected(item);
     props.onFilter &&
-      props.onFilter({ sort_by: item.sort_by, sort_type: item.sort_type });
+      props.onFilter({ sortBy: item.sortBy, sortType: item.sortType });
     setHidden(true);
   };
   return (

@@ -3,6 +3,9 @@ import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlin
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import styles from "../style.module.css";
 import { useWishlistContext } from "../../../context/WishlistContext";
+import { hasCookie } from "cookies-next";
+import { COOKIE_ACCESSTOKEN_NAME } from "../../../utils/constants";
+import { useSnackbarContext } from "../../../context/SnackbarContext";
 type Props = {
   productId: number;
 };
@@ -10,18 +13,23 @@ type Props = {
 const WishlistIcon = (props: Props) => {
   const { listId, addToWishlist, deleteItem } = useWishlistContext();
   const [state, setState] = useState<boolean>(false);
+  const { show } = useSnackbarContext();
 
   useEffect(() => {
     setState(listId.findIndex((id: number) => id === props.productId) !== -1);
   }, [listId]);
 
   const toggleState = () => {
-    if (state) {
-      deleteItem(props.productId);
+    if (hasCookie(COOKIE_ACCESSTOKEN_NAME)) {
+      if (state) {
+        deleteItem(props.productId);
+      } else {
+        addToWishlist(props.productId);
+      }
+      setState((s) => !s);
     } else {
-      addToWishlist(props.productId);
+      show("Bạn cần đăng nhập để thực hiện thao tác này");
     }
-    setState((s) => !s);
   };
 
   return (

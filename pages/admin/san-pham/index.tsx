@@ -5,8 +5,14 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { getAllProducts } from "../../../apis/product";
 import {
+  deleteProduct,
+  getAllProducts,
+  restoreProduct,
+  softDeleteProduct,
+} from "../../../apis/product";
+import {
+  ConfirmDialog,
   DataManagement,
   ModalProductVariant,
   ModalProductVariantImage,
@@ -27,6 +33,7 @@ const Products = (props: Props) => {
   const [productData, setProductData] = useState<ResponseItems<Product>>(
     props.productData
   );
+  const [current, setCurrent] = useState<Product | null>(null);
   const handleCloseModalPV = () => {
     setModalPV(false);
   };
@@ -49,7 +56,57 @@ const Products = (props: Props) => {
       ),
     });
   };
-  console.log(props.productData);
+
+  const handleSoftDelete = async (id: number) => {
+    try {
+      const { message } = await softDeleteProduct(id);
+      if (message === MSG_SUCCESS) {
+        const _productData = { ...productData };
+        const index = _productData.items.findIndex((p: Product) => p.id === id);
+        if (index !== -1) {
+          _productData.items[index].deletedAt = "" + new Date().getTime();
+          setProductData(_productData);
+        }
+      }
+    } catch (error) {
+      console.log("Soft delete group product error", error);
+    }
+  };
+
+  const handleRestore = async (id: number) => {
+    try {
+      const { message } = await restoreProduct(id);
+      if (message === MSG_SUCCESS) {
+        const _productData = { ...productData };
+        const index = _productData.items.findIndex((p: Product) => p.id === id);
+        if (index !== -1) {
+          _productData.items[index].deletedAt = null;
+          setProductData(_productData);
+        }
+      }
+    } catch (error) {
+      console.log("Restore delete group product error", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      if (current) {
+        let { id } = current;
+        const { message } = await deleteProduct(id);
+        if (message === MSG_SUCCESS) {
+          const _productData = { ...productData };
+          _productData.items = _productData.items.filter(
+            (gp: Product) => gp.id !== id
+          );
+          _productData.count -= 1;
+          setProductData(_productData);
+        }
+      }
+    } catch (error) {
+      console.log("Delete group product error", error);
+    }
+  };
 
   useEffect(() => {
     setProductData(props.productData);
@@ -148,10 +205,16 @@ const Products = (props: Props) => {
               key: "isVisible",
               display: "Hiển thị",
               render: (row: Product) =>
-                row.isVisible ? (
-                  <CheckIcon style={{ color: "#33eb91" }} />
+                row.deletedAt ? (
+                  <ClearIcon
+                    style={{ color: "#d32f2f" }}
+                    onClick={() => handleRestore(row.id)}
+                  />
                 ) : (
-                  <ClearIcon style={{ color: "#00695f" }} />
+                  <CheckIcon
+                    style={{ color: "#33eb91" }}
+                    onClick={() => handleSoftDelete(row.id)}
+                  />
                 ),
             },
             {
@@ -165,6 +228,15 @@ const Products = (props: Props) => {
                   <button className="btnDelete" style={{ marginLeft: "8px" }}>
                     Xóa
                   </button>
+                  {current ? (
+                    <ConfirmDialog
+                      open={current.id === row.id ? true : false}
+                      onClose={() => setCurrent(null)}
+                      onConfirm={handleDelete}
+                      title="Xác nhận"
+                      text="Bạn có chắc chắn muốn xóa không?"
+                    />
+                  ) : null}
                 </div>
               ),
             },
@@ -193,19 +265,15 @@ const Products = (props: Props) => {
 export default Products;
 
 export async function getServerSideProps(context: any) {
-  const { p, sort_by, sort_type } = context.query;
+  const { p, sortBy, sortType } = context.query;
   const res = await getAllProducts({
     p: p || 1,
     limit: LIMIT,
-    sort_by,
-    sort_type,
+    sortBy,
+    sortType,
+    withDeleted: true,
   });
   const { message, data } = res;
-  return message === MSG_SUCCESS
-    ? {
-        props: { productData: data },
-      }
-    : {
-        notFound: true,
-      };
+  if (message === MSG_SUCCESS) return { props: { productData: data } };
+  return { notFound: true };
 }

@@ -141,10 +141,9 @@ const Sidebar = (props: Props) => {
 
   useEffect(() => {
     (async () => {
-      const { message, data } = await getAllVariantValues();
+      const { message, data } = await getAllVariantValues({ sortType: "asc" });
 
       if (message === MSG_SUCCESS) {
-        console.log(formatVariants(data.items));
         setVariantValues(formatVariants(data.items));
       }
     })();

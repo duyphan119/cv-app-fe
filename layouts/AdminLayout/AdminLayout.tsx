@@ -1,9 +1,10 @@
 import { Box } from "@mui/material";
+import { hasCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import React, { ReactNode, useEffect, useState } from "react";
-import { changeProfile, getProfile } from "../../apis/auth";
+import { ReactNode, useEffect, useState } from "react";
+import { getProfile } from "../../apis/auth";
 import { useAuthContext } from "../../context/AuthContext";
-import { MSG_SUCCESS } from "../../utils/constants";
+import { COOKIE_ACCESSTOKEN_NAME, MSG_SUCCESS } from "../../utils/constants";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 
@@ -20,16 +21,19 @@ const AdminLayout = (props: Props) => {
   useEffect(() => {
     (async () => {
       try {
-        const { message, data } = await getProfile();
-        if (message !== MSG_SUCCESS) {
-          router.push("/admin/dang-nhap");
-          changeProfile(null);
-        } else {
-          setIsLogged(true);
-          login(data);
+        if (hasCookie(COOKIE_ACCESSTOKEN_NAME)) {
+          const { message, data } = await getProfile();
+          if (message !== MSG_SUCCESS) {
+            if (router.pathname.includes("/admin"))
+              router.push("/admin/dang-nhap");
+            changeProfile(null);
+          } else {
+            setIsLogged(true);
+            login(data);
+          }
         }
       } catch (error) {
-        router.push("/admin/dang-nhap");
+        if (router.pathname.includes("/admin")) router.push("/admin/dang-nhap");
         changeProfile(null);
       }
     })();

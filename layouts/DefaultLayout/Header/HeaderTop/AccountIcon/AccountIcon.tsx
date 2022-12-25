@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import Link from "next/link";
-import { useAuthContext } from "../../../../../context/AuthContext";
+import { useState } from "react";
 import { ModalAuth } from "../../../../../components";
-import { getProfile } from "../../../../../apis/auth";
-import { MSG_SUCCESS } from "../../../../../utils/constants";
+import { useAuthContext } from "../../../../../context/AuthContext";
 type Props = {};
 
 const AccountIcon = (props: Props) => {
-  const { profile, changeProfile, isLogged } = useAuthContext();
+  const { isLogged } = useAuthContext();
   const [open, setOpen] = useState<boolean>(false);
 
   const handleClick = async (e: any) => {

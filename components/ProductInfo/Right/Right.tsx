@@ -66,7 +66,7 @@ const Right = (props: Props) => {
       <div className={styles.name}>{props.product.name}</div>
       <div className={styles.price}>
         99000đ
-        {/* <span>{props.product.productVariants[0].price}đ</span> */}
+        {/* <span>{props.product.productVariants[0].price}</span> */}
       </div>
       {variants.keys.map((key: string) => {
         return (

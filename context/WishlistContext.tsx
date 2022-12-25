@@ -1,3 +1,4 @@
+import { hasCookie } from "cookies-next";
 import { createKey } from "next/dist/shared/lib/router/router";
 import {
   createContext,
@@ -11,7 +12,7 @@ import {
   deleteFavoriteProduct,
   getFavoriteProducts,
 } from "../apis/product";
-import { MSG_SUCCESS } from "../utils/constants";
+import { COOKIE_ACCESSTOKEN_NAME, MSG_SUCCESS } from "../utils/constants";
 import { Product } from "../utils/types";
 import { useSnackbarContext } from "./SnackbarContext";
 type Props = {
@@ -26,9 +27,11 @@ const WishlistWrapper = (props: Props) => {
   useEffect(() => {
     (async () => {
       try {
-        const { message, data } = await getFavoriteProducts();
-        if (message === MSG_SUCCESS) {
-          setListId(data.items.map((prod: Product) => prod.id));
+        if (hasCookie(COOKIE_ACCESSTOKEN_NAME)) {
+          const { message, data } = await getFavoriteProducts();
+          if (message === MSG_SUCCESS) {
+            setListId(data.items.map((prod: Product) => prod.id));
+          }
         }
       } catch (error) {
         console.log(error);
@@ -63,7 +66,9 @@ const WishlistWrapper = (props: Props) => {
   };
 
   return (
-    <WishlistContext.Provider value={{ listId, addToWishlist, deleteItem }}>
+    <WishlistContext.Provider
+      value={{ listId, addToWishlist, deleteItem, setListId }}
+    >
       {props.children}
     </WishlistContext.Provider>
   );

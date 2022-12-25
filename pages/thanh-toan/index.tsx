@@ -1,17 +1,28 @@
 import { Container, Grid } from "@mui/material";
+import { getCookie, hasCookie, setCookie } from "cookies-next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { checkout as apiCheckout } from "../../apis/order";
+import { checkOrderDiscount } from "../../apis/orderdiscount";
+import { getMyUserAddresses } from "../../apis/useraddress";
 import { useCartContext } from "../../context/CartContext";
 import provinces from "../../province.json";
 import styles from "../../styles/Payment.module.css";
-import { MSG_SUCCESS } from "../../utils/constants";
+import {
+  COOKIE_ORDER_DISCOUNT_CODE_NAME,
+  MSG_SUCCESS,
+} from "../../utils/constants";
 import { getPriceCartItem, getThumbnailOrderItem } from "../../utils/helpers";
-import { OrderItem, Variant, VariantValue } from "../../utils/types";
+import {
+  OrderDiscount,
+  OrderItem,
+  UserAddress,
+  VariantValue,
+} from "../../utils/types";
 
 type Props = {};
 
@@ -24,12 +35,25 @@ type Inputs = {
   ward: string;
 };
 
+type Discount = {
+  code: string;
+  value: number;
+  id: number;
+};
+
 const Payment = (props: Props) => {
   const router = useRouter();
   const { cart, checkout, total } = useCartContext();
   const [districts, setDistricts] = useState<any>([]);
   const [wards, setWards] = useState<any>([]);
   const [paymentMethod, setPaymentMethod] = useState<string>("COD");
+  const [userAddresses, setUserAddresses] = useState<UserAddress[]>([]);
+  const [userAddress, setUserAddress] = useState<UserAddress | null>(null);
+  const [visible, setVisible] = useState<boolean>(false);
+  const [code, setCode] = useState<string>("");
+  const [orderDiscount, setOrderDiscount] = useState<OrderDiscount | null>(
+    null
+  );
   const {
     register,
     handleSubmit,
@@ -47,6 +71,15 @@ const Payment = (props: Props) => {
         ...data,
         paymentMethod,
         shippingPrice: 0,
+        ...(visible && userAddress
+          ? {
+              province: userAddress.province,
+              district: userAddress.district,
+              ward: userAddress.ward,
+              address: userAddress.address,
+            }
+          : {}),
+        ...(orderDiscount ? { discountId: orderDiscount.id } : {}),
       });
       if (message === MSG_SUCCESS) {
         checkout();
@@ -56,6 +89,49 @@ const Payment = (props: Props) => {
       console.log(error);
     }
   };
+
+  const handleChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    const id = +e.target.value;
+    const result = userAddresses.find((_) => _.id === id);
+
+    if (result) {
+      setUserAddress(result);
+    }
+  };
+
+  const handleUse = async () => {
+    try {
+      if (code !== "") {
+        const { message, data } = await checkOrderDiscount(code, total);
+        if (message === MSG_SUCCESS) {
+          setOrderDiscount(data);
+          setCode("");
+        }
+      }
+    } catch (error) {
+      console.log("CHECK ORDER DISCOUNT CODE ERROR", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchUserAddresses = async () => {
+      try {
+        const { message, data } = await getMyUserAddresses();
+        if (message === MSG_SUCCESS) {
+          setUserAddresses(data.items);
+          if (data.count > 0) {
+            const userAddress = data.items[0];
+            setUserAddress(userAddress);
+          }
+          setVisible(data.count > 0);
+        }
+      } catch (error) {
+        console.log("FETCH USER ADDRESS ERROR", error);
+      }
+    };
+
+    fetchUserAddresses();
+  }, []);
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
@@ -98,57 +174,88 @@ const Payment = (props: Props) => {
       </>
       <Container maxWidth="lg" sx={{ marginBlock: "24px" }}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container>
+          <Grid container columnSpacing={2} rowSpacing={2}>
             <Grid item xs={12} md={8}>
               <h1>Thông tin đặt hàng</h1>
-              <Grid container>
+              <Grid container columnSpacing={2} rowSpacing={2}>
                 <Grid item xs={12} md={6}>
-                  <Grid container columnSpacing={2} rowSpacing={2}>
-                    <Grid item xs={12}>
-                      <div className="form-group">
-                        {errors.fullName &&
-                          errors.fullName.type === "required" && (
-                            <div className="form-error">
-                              Họ tên không được để trống
-                            </div>
-                          )}
-                        <input
-                          type="text"
-                          className="form-control"
-                          {...register("fullName", {
-                            required: true,
-                          })}
-                        />
-                        <label htmlFor="" className="form-label required">
-                          Họ tên
-                        </label>
+                  <div className="form-group">
+                    {errors.fullName && errors.fullName.type === "required" && (
+                      <div className="form-error">
+                        Họ tên không được để trống
                       </div>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <div className="form-group">
-                        {errors.phone && errors.phone.type === "required" && (
-                          <div className="form-error">
-                            Số điện thoại không được để trống
-                          </div>
-                        )}
-                        {errors.phone && errors.phone.type === "pattern" && (
-                          <div className="form-error">
-                            Số điện thoại không hợp lệ
-                          </div>
-                        )}
-                        <input
-                          type="text"
-                          className="form-control"
-                          {...register("phone", {
-                            required: true,
-                            pattern: /(84|0[3|5|7|8|9])+([0-9]{8})\b/g,
-                          })}
-                        />
-                        <label htmlFor="" className="form-label required">
-                          Số điện thoại
-                        </label>
+                    )}
+                    <input
+                      type="text"
+                      className="form-control"
+                      {...register("fullName", {
+                        required: true,
+                      })}
+                    />
+                    <label htmlFor="" className="form-label required">
+                      Họ tên
+                    </label>
+                  </div>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <div className="form-group">
+                    {errors.phone && errors.phone.type === "required" && (
+                      <div className="form-error">
+                        Số điện thoại không được để trống
                       </div>
-                    </Grid>
+                    )}
+                    {errors.phone && errors.phone.type === "pattern" && (
+                      <div className="form-error">
+                        Số điện thoại không hợp lệ
+                      </div>
+                    )}
+                    <input
+                      type="text"
+                      className="form-control"
+                      {...register("phone", {
+                        required: true,
+                        pattern: /(84|0[3|5|7|8|9])+([0-9]{8})\b/g,
+                      })}
+                    />
+                    <label htmlFor="" className="form-label required">
+                      Số điện thoại
+                    </label>
+                  </div>
+                </Grid>
+                {visible && userAddress ? (
+                  <Grid item xs={12}>
+                    <div className="form-group">
+                      <select
+                        className="form-control"
+                        value={userAddress.id}
+                        onChange={handleChange}
+                      >
+                        {userAddresses.map((item: UserAddress) => {
+                          return (
+                            <option value={item.id} key={item.id}>
+                              {item.address},&nbsp;{item.ward}
+                              ,&nbsp;{item.district},&nbsp;
+                              {item.province}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      <label htmlFor="" className="form-label required">
+                        Địa chỉ
+                      </label>
+                    </div>
+                  </Grid>
+                ) : null}
+                <Grid item xs={12}>
+                  <div
+                    style={{ cursor: "pointer", color: "var(--logo-bg-color)" }}
+                    onClick={() => setVisible((v) => !v)}
+                  >
+                    {visible ? "+ Thêm địa chỉ khác" : "Sổ địa chỉ"}
+                  </div>
+                </Grid>
+                {!visible ? (
+                  <>
                     <Grid item xs={12}>
                       <div className="form-group">
                         {errors.province &&
@@ -244,8 +351,8 @@ const Payment = (props: Props) => {
                         </label>
                       </div>
                     </Grid>
-                  </Grid>
-                </Grid>
+                  </>
+                ) : null}
               </Grid>
               <h1>Phương thức thanh toán</h1>
               <Grid container columnSpacing={2} rowSpacing={2}>
@@ -327,17 +434,46 @@ const Payment = (props: Props) => {
                     </li>
                   );
                 })}
+                <li>
+                  <div className={styles.discount}>
+                    <input
+                      placeholder="Nhập mã giảm giá"
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                    />
+                    <button type="button" onClick={handleUse}>
+                      Sử dụng
+                    </button>
+                  </div>
+                  {orderDiscount ? (
+                    <div className={styles.usingDiscount}>
+                      Đã áp dụng mã giảm giá {orderDiscount.code}.
+                      <span
+                        className={styles.cancelDiscount}
+                        onClick={() => setOrderDiscount(null)}
+                      >
+                        Hủy
+                      </span>
+                    </div>
+                  ) : null}
+                </li>
                 <li className={styles["first-row"]}>
                   <span>Giá gốc</span>
                   <span>{total}đ</span>
                 </li>
-                <li className={styles.row}>
-                  <span>Giảm giá</span>
-                  <span>0đ</span>
-                </li>
+                {orderDiscount ? (
+                  <li className={styles.row}>
+                    <span>Giảm giá</span>
+                    <span style={{ color: "red" }}>
+                      -{orderDiscount.value}đ
+                    </span>
+                  </li>
+                ) : null}
                 <li className={styles["last-row"]}>
                   <span>Tổng cộng</span>
-                  <span>{total}đ</span>
+                  <span>
+                    {total - (orderDiscount ? orderDiscount.value : 0)}đ
+                  </span>
                 </li>
                 <li className={styles.actions}>
                   <Link href="/gio-hang">Quay lại giỏ hàng</Link>

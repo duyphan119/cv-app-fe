@@ -1,5 +1,5 @@
-import { privateAxios } from "../config/configAxios";
-import { CartItem, QueryParams } from "../utils/types";
+import { privateAxios, serverSideAxios } from "../config/configAxios";
+import { QueryParams } from "../utils/types";
 
 export type CreateCartItem = {
   productId: number;
@@ -21,7 +21,15 @@ export type Checkout = {
 export type OrderQueryParams = {
   start?: string;
   end?: string;
+  address?: string;
+  fullName?: string;
+  phone?: string;
 } & QueryParams;
+
+export const getAllOrders = (
+  params: OrderQueryParams,
+  accessToken?: string
+): Promise<any> => serverSideAxios(accessToken).get("order", { params });
 
 export const createCartItem = (body: CreateCartItem): Promise<any> =>
   privateAxios().post("order/cart-item", body);
@@ -37,5 +45,11 @@ export const getCart = (): Promise<any> => privateAxios().get("/order/cart");
 export const checkout = (body: Checkout): Promise<any> =>
   privateAxios().patch("order/checkout", body);
 
-export const myOrders = async (params?: OrderQueryParams): Promise<any> =>
+export const myOrders = (params?: OrderQueryParams): Promise<any> =>
   privateAxios().get("order/user", { params });
+
+export const getOrderById = (id: number, accessToken?: string): Promise<any> =>
+  serverSideAxios(accessToken).get("order/" + id);
+
+export const updateStatus = (id: number, status: string): Promise<any> =>
+  privateAxios().patch(`order/${id}/status`, { status });

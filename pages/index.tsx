@@ -22,6 +22,11 @@ const Products = (props: ProductsProps) => {
             </Grid>
           );
         })}
+        <Grid item xs={12} className={styles.viewAllWrapper}>
+          <Link href="/san-pham" className={styles.viewAll}>
+            Xem tất cả
+          </Link>
+        </Grid>
       </Grid>
     </Container>
   );
@@ -118,7 +123,7 @@ export default function Home({ productData }: Props) {
 }
 export async function getServerSideProps() {
   const { data } = await getAllProducts({
-    limit: 18,
+    limit: 24,
     product_variants: true,
     images: true,
   });

@@ -3,8 +3,8 @@ export type Action = {
   type?: string;
 };
 export type SortParams = {
-  sort_by?: string;
-  sort_type?: string;
+  sortBy?: string;
+  sortType?: string;
 };
 export type PaginationParams = {
   p?: string | number;
@@ -28,7 +28,6 @@ export type Product = {
   description: string;
   thumbnail: string;
   groupProductId: number;
-  isVisible: boolean;
   price: number;
   inventory: number;
   detail: string;
@@ -77,6 +76,14 @@ export type CartItem = {
   productVariantId: number;
   product: Product;
 }>;
+export type OrderDiscount = {
+  id: number;
+  code: string;
+  value: number;
+  minValue: number;
+  start: string;
+  end: string;
+} & Timestamp;
 export type Order = {
   id: number;
   province: string;
@@ -89,10 +96,13 @@ export type Order = {
   paymentMethod: string;
   shippingPrice: number;
   userId: number;
-  couponId: number | null;
+  discountId: number | null;
   user: User;
   items: OrderItem[];
-} & Timestamp;
+} & Timestamp &
+  Partial<{
+    discount: OrderDiscount;
+  }>;
 export type OrderItem = CartItem & {
   price: number;
   id: number;
@@ -116,6 +126,15 @@ export type GroupProduct = {
   thumbnail: string;
 } & Timestamp;
 
+export type UserAddress = {
+  id: number;
+  userId: number;
+  province: string;
+  district: string;
+  ward: string;
+  address: string;
+} & Timestamp;
+
 export type ResponseItems<T> = {
   items: T[];
   count: number;
@@ -128,8 +147,8 @@ export type RenderVariantValues = {
 
 export type Filter = {
   p?: number;
-  sort_by?: number;
-  sort_type?: number;
+  sortBy?: number;
+  sortType?: number;
   min_price?: number;
   max_price?: number;
   v_ids?: string;
@@ -141,4 +160,8 @@ export type SortState = {
 };
 export type FormattedVariants = {
   [key: string]: VariantValue[];
+};
+export type FetchState = {
+  loading: boolean;
+  isSuccess: boolean;
 };

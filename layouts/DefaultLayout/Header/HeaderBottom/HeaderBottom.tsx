@@ -14,8 +14,8 @@ const HeaderBottom = (props: Props) => {
     (async () => {
       try {
         const res = await getAllGroupProducts({
-          sort_by: "name",
-          sort_type: "asc",
+          sortBy: "name",
+          sortType: "asc",
         });
         const { message, data } = res;
         if (message === MSG_SUCCESS) {

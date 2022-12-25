@@ -5,11 +5,16 @@ import {
   useEffect,
   useState,
 } from "react";
-import { User } from "../utils/types";
+import { Product, User } from "../utils/types";
 import { logout as apiLogout, RegisterDTO } from "../apis/auth";
-import { MSG_SUCCESS } from "../utils/constants";
+import { COOKIE_ACCESSTOKEN_NAME, MSG_SUCCESS } from "../utils/constants";
 import { useSnackbarContext } from "./SnackbarContext";
-
+import { setCookie, deleteCookie } from "cookies-next";
+import jwtDecode from "jwt-decode";
+import { getCart } from "../apis/order";
+import { getFavoriteProducts } from "../apis/product";
+import { useCartContext } from "./CartContext";
+import { useWishlistContext } from "./WishlistContext";
 const AuthContext = createContext<any>({});
 
 type Props = {
@@ -20,18 +25,39 @@ const AuthWrapper = ({ children }: Props) => {
   const { show } = useSnackbarContext();
   const [profile, setProfile] = useState<User | null>();
   const [isLogged, setIsLogged] = useState<boolean>(false);
+  const { setCart } = useCartContext();
+  const { setListId } = useWishlistContext();
 
   const changeProfile = (newProfile: User | null) => {
     setProfile(newProfile);
     localStorage.setItem("user", JSON.stringify(newProfile));
   };
-  const login = (user: User, accessToken: string) => {
+  const login = async (user: User, accessToken: string) => {
     if (accessToken && user) {
-      console.log({ user, accessToken });
       setProfile(user);
       localStorage.setItem("user", JSON.stringify(user));
-      localStorage.setItem("accessToken", accessToken);
+      let decoded: any = jwtDecode(accessToken);
+      setCookie(COOKIE_ACCESSTOKEN_NAME, accessToken, {
+        maxAge: decoded.exp * 1000,
+      });
       show("Đăng nhập thành công", "success");
+      try {
+        let [resCart, resWishlist] = await Promise.all([
+          getCart(),
+          getFavoriteProducts(),
+        ]);
+        let { message: msg1, data: data1 } = resCart;
+        if (msg1 === MSG_SUCCESS) {
+          setCart(data1.items ? data1 : { ...data1, items: [] });
+        }
+
+        let { message: msg2, data: data2 } = resWishlist;
+        if (msg2 === MSG_SUCCESS) {
+          setListId(data2.items.map((prod: Product) => prod.id));
+        }
+      } catch (error) {
+        console.log("GET CART & WISHLIST ERROR: ", error);
+      }
     }
   };
   const register = (user: User, accessToken: string) => {
@@ -40,7 +66,9 @@ const AuthWrapper = ({ children }: Props) => {
   const logout = async () => {
     setProfile(null);
     localStorage.removeItem("user");
-    localStorage.removeItem("accessToken");
+    deleteCookie(COOKIE_ACCESSTOKEN_NAME);
+    setCart({ items: [] });
+    setListId([]);
   };
 
   useEffect(() => {

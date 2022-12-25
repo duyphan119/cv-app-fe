@@ -101,14 +101,17 @@
 .quantity .desc {
   border-right: 1px solid gray;
 }
-.add-to-cart-btn {
+.addToCartBtn {
   background: #000;
   color: #fff;
-  padding: 0 16px;
-  border-radius: 2px;
   height: 36px;
+  width: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.add-to-cart-btn:hover {
+.addToCartBtn:hover {
   box-shadow: 0 0 1px 2px darkgray;
 }
 .name-wrapper {

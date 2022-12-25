@@ -49,3 +49,12 @@ export const updateThumbnailProduct = (
   thumbnail: string
 ): Promise<any> =>
   privateAxios().patch("product/thumbnail/" + productId, { thumbnail });
+
+export const softDeleteProduct = (id: number): Promise<any> =>
+  privateAxios().delete("product/soft/" + id);
+
+export const restoreProduct = (id: number): Promise<any> =>
+  privateAxios().delete("product/restore/" + id);
+
+export const deleteProduct = (id: number): Promise<any> =>
+  privateAxios().delete("product/" + id);

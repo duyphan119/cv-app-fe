@@ -96,8 +96,8 @@ const SearchInput = (props: Props) => {
                         <div className={styles.name}>{product.name}</div>
                         <div className={styles.price}>
                           {product.minPrice === product.maxPrice
-                            ? `${product.minPrice}đ`
-                            : `${product.minPrice}đ - ${product.maxPrice}đ`}
+                            ? `${product.minPrice}`
+                            : `${product.minPrice} - ${product.maxPrice}`}
                         </div>
                       </div>
                     </Link>

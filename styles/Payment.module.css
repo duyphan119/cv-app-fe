@@ -84,3 +84,27 @@
 .actions button:hover {
   box-shadow: 0 0 1px 2px var(--logo-bg-color);
 }
+.discount {
+  display: flex;
+  gap: 16px;
+}
+.discount input {
+  flex: 1;
+  padding: 8px;
+  outline: none;
+}
+.discount button {
+  padding: 8px 16px;
+  box-shadow: 0 0 1px 0px #000;
+}
+.usingDiscount {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cancelDiscount {
+  color: red;
+  text-decoration: underline;
+  cursor: pointer;
+}

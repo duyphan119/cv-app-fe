@@ -36,8 +36,8 @@ const DataManagement = (props: Props) => {
     e.preventDefault();
     let obj: any = {
       ...(PAGE && PAGE > 1 ? { p: PAGE } : {}),
-      sort_by: sortBy,
-      sort_type: sortType,
+      sortBy: sortBy,
+      sortType: sortType,
     };
     let url = new URLSearchParams(obj).toString();
     router.push(`${router.pathname}${url ? "?" : ""}${url}`);
@@ -54,7 +54,7 @@ const DataManagement = (props: Props) => {
   const handleChange = (p: number) => {
     let obj: any = {
       ...(p && p > 1 ? { p } : {}),
-      ...(sortBy !== "" ? { sort_by: sortBy, sort_type: sortType } : {}),
+      ...(sortBy !== "" ? { sortBy: sortBy, sortType: sortType } : {}),
     };
     let url = new URLSearchParams(obj).toString();
     router.push(`${router.pathname}${url ? "?" : ""}${url}`);
@@ -65,7 +65,7 @@ const DataManagement = (props: Props) => {
       <Box className={styles.actionsWrapper}>
         <Box className={styles.actionsWrapperLeft}>
           <div className={styles.searchWrapper}>
-            <input type="search" placeholder="Tìm theo tên" />
+            <input type="search" placeholder="Tìm tại đây" />
             <button className="btnSearch">Tìm</button>
           </div>
           <form className={styles.sortForm} onSubmit={handleSort}>
@@ -99,7 +99,7 @@ const DataManagement = (props: Props) => {
         <thead>
           <tr>
             {props.hasCheck ? (
-              <th style={{ width: 40 }}>
+              <th style={{ backgroundColor: "rgb(250, 250, 250)", width: 40 }}>
                 <label htmlFor="checkAll">
                   <input type="checkbox" id="checkAll" />
                 </label>
@@ -108,7 +108,10 @@ const DataManagement = (props: Props) => {
             {props.columns?.map((column: Column) => (
               <th
                 key={column.key || column.display}
-                style={column.style}
+                style={{
+                  backgroundColor: "rgb(250, 250, 250)",
+                  ...column.style,
+                }}
                 className={column.className}
               >
                 {column.display}
@@ -117,39 +120,57 @@ const DataManagement = (props: Props) => {
           </tr>
         </thead>
         <tbody>
-          {props.rows?.map((row: any, index: number) => {
-            return (
-              <tr key={row.id}>
-                {props.hasCheck ? (
-                  <td>
-                    <label htmlFor={"check" + row.id}>
-                      <input type="checkbox" id={"check" + row.id} />
-                    </label>
-                  </td>
-                ) : null}
-                {props.columns?.map((column: Column) => (
-                  <td key={column.key} style={column.style}>
-                    {showRow(column, row, index)}
-                  </td>
-                ))}
-              </tr>
-            );
-          })}
+          {props.rows && props.rows.length > 0 ? (
+            props.rows.map((row: any, index: number) => {
+              return (
+                <tr key={row.id}>
+                  {props.hasCheck ? (
+                    <td>
+                      <label htmlFor={"check" + row.id}>
+                        <input type="checkbox" id={"check" + row.id} />
+                      </label>
+                    </td>
+                  ) : null}
+                  {props.columns?.map((column: Column) => (
+                    <td key={column.key} style={column.style}>
+                      {showRow(column, row, index)}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td
+                colSpan={
+                  props.columns
+                    ? props.columns.length + (props.hasCheck ? 1 : 0)
+                    : 0
+                }
+              >
+                Không có bản ghi nào!
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
-      <Pagination
-        page={PAGE}
-        count={
-          props.count && props.limit ? Math.ceil(props.count / props.limit) : 0
-        }
-        sx={{ ul: { justifyContent: "center", marginTop: "16px" } }}
-        variant="outlined"
-        shape="rounded"
-        showLastButton
-        showFirstButton
-        onChange={(e, page) => handleChange(page)}
-        color="primary"
-      />
+      {props.rows && props.rows.length > 0 ? (
+        <Pagination
+          page={PAGE}
+          count={
+            props.count && props.limit
+              ? Math.ceil(props.count / props.limit)
+              : 0
+          }
+          sx={{ ul: { justifyContent: "center", marginTop: "16px" } }}
+          variant="outlined"
+          shape="rounded"
+          showLastButton
+          showFirstButton
+          onChange={(e, page) => handleChange(page)}
+          color="primary"
+        />
+      ) : null}
     </Paper>
   );
 };

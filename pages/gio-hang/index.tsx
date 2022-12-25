@@ -1,15 +1,15 @@
-import Head from "next/head";
-import React, { useMemo } from "react";
-import { DefaultLayout } from "../../layouts";
-import styles from "../../styles/Cart.module.css";
-import { Container, IconButton } from "@mui/material";
-import { useCartContext } from "../../context/CartContext";
-import Image from "next/image";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { Container, IconButton } from "@mui/material";
+import Head from "next/head";
+import Image from "next/image";
 import Link from "next/link";
+import React, { useMemo } from "react";
+import { useCartContext } from "../../context/CartContext";
+import { DefaultLayout } from "../../layouts";
 import emptyCartPng from "../../public/empty-cart.png";
-import { OrderItem, VariantValue } from "../../utils/types";
+import styles from "../../styles/Cart.module.css";
 import { getPriceCartItem, getThumbnailOrderItem } from "../../utils/helpers";
+import { OrderItem } from "../../utils/types";
 
 type Props = {};
 
@@ -57,15 +57,11 @@ const CartItem = React.memo((props: CartItemProps) => {
             >
               {props.item.product?.name}
             </Link>
-            {props.item.productVariant?.variantValues?.map(
-              (variantValue: VariantValue) => {
-                return (
-                  <div key={variantValue.id} className={styles.variant}>
-                    {variantValue?.variant?.name}: {variantValue.value}
-                  </div>
-                );
-              }
-            )}
+            {props.item.productVariant ? (
+              <div className={styles.variant}>
+                {props.item.productVariant.name}
+              </div>
+            ) : null}
           </div>
         </div>
       </td>
@@ -97,7 +93,8 @@ const CartItem = React.memo((props: CartItemProps) => {
 });
 
 const TableCart = () => {
-  const { cart, total } = useCartContext();
+  const { cart } = useCartContext();
+
   return cart ? (
     <table className={styles["table-cart"]}>
       <thead>
@@ -109,20 +106,9 @@ const TableCart = () => {
         </tr>
       </thead>
       <tbody>
-        {cart.items.map((item: any) => {
-          return <CartItem key={item.productVariant.id} item={item} />;
+        {cart.items.map((item: OrderItem) => {
+          return <CartItem key={item.id} item={item} />;
         })}
-        <tr>
-          <td colSpan={4}>
-            <div className={styles.last}>
-              <div className={styles.coupon}>
-                <input placeholder="Nhập mã giảm giá" />
-                <button>Sử dụng</button>
-              </div>
-              <div>Tổng: {total}đ</div>
-            </div>
-          </td>
-        </tr>
       </tbody>
     </table>
   ) : null;

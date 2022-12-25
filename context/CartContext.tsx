@@ -1,3 +1,4 @@
+import { hasCookie } from "cookies-next";
 import {
   createContext,
   useContext,
@@ -11,8 +12,9 @@ import {
   getCart,
   updateCartItem,
 } from "../apis/order";
-import { MSG_SUCCESS } from "../utils/constants";
+import { COOKIE_ACCESSTOKEN_NAME, MSG_SUCCESS } from "../utils/constants";
 import { Cart, CartItem, OrderItem } from "../utils/types";
+import { useAuthContext } from "./AuthContext";
 import { useSnackbarContext } from "./SnackbarContext";
 type Props = {
   children?: ReactNode;
@@ -28,9 +30,11 @@ const CartWrapper = (props: Props) => {
   useEffect(() => {
     (async () => {
       try {
-        const { message, data } = await getCart();
-        if (message === MSG_SUCCESS) {
-          setCart(data.items ? data : { ...data, items: [] });
+        if (hasCookie(COOKIE_ACCESSTOKEN_NAME)) {
+          const { message, data } = await getCart();
+          if (message === MSG_SUCCESS) {
+            setCart(data.items ? data : { ...data, items: [] });
+          }
         }
         setLoading(false);
       } catch (error) {
@@ -146,6 +150,7 @@ const CartWrapper = (props: Props) => {
         total,
         checkout,
         loading,
+        setCart,
       }}
     >
       {props.children}

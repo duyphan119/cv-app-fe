@@ -1,9 +1,8 @@
-import React from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { login, LoginDTO } from "../../../apis/auth";
-import { useForm, SubmitHandler } from "react-hook-form";
-import styles from "../style.module.css";
 import { useAuthContext } from "../../../context/AuthContext";
 import { MSG_SUCCESS } from "../../../utils/constants";
+import styles from "../style.module.css";
 type Props = {
   onClose?: any;
 };
@@ -22,12 +21,12 @@ const Login = (props: Props) => {
       const { message, data: _data } = res;
       if (message === MSG_SUCCESS) {
         _login(_data.user, _data.accessToken);
-        props.onClose();
       }
     } catch (error) {
       console.log(error);
     }
   };
+
   return (
     <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <div className="form-group">

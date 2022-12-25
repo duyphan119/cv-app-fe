@@ -71,7 +71,8 @@ const ProductCard = (props: Props) => {
               selected.findIndex((_vv: VariantValue) => vv.id === _vv.id) !== -1
           )
       );
-      if (productVariant)
+
+      if (productVariant) {
         addToCart({
           quantity,
           ...(props.product.productVariants && productVariant
@@ -80,6 +81,7 @@ const ProductCard = (props: Props) => {
           productId: props.product.id,
           product: props.product,
         });
+      }
     }
   };
 
@@ -138,7 +140,7 @@ const ProductCard = (props: Props) => {
               ? selectedProductVariant.price
               : props.product.minPrice === props.product.maxPrice
               ? props.product.minPrice
-              : `${props.product.minPrice}đ - ${props.product.maxPrice}`}
+              : `${props.product.minPrice} - ${props.product.maxPrice}`}
             đ
           </span>
         </div>

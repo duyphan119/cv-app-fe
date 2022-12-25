@@ -13,7 +13,7 @@ type Props = {
   productData: ResponseItems<Product>;
   onFilter?: any;
 };
-const LIMIT = 9;
+const LIMIT = 24;
 const AllProducts = (props: Props) => {
   const router = useRouter();
   const { p } = router.query;
@@ -69,7 +69,7 @@ const AllProducts = (props: Props) => {
     <>
       <ProductsLayout
         onFilter={handleFilter}
-        totalProducts={16}
+        totalProducts={props.productData.count}
         query={router.query}
         breadcrumbs={{
           links: [
@@ -91,7 +91,7 @@ const AllProducts = (props: Props) => {
           <Grid container columnSpacing={2} rowSpacing={2}>
             {props.productData.items.map((product: Product) => {
               return (
-                <Grid item xs={12} sm={6} md={4} lg={6} xl={4} key={product.id}>
+                <Grid item xs={12} sm={6} md={3} lg={4} xl={3} key={product.id}>
                   <ProductCard product={product} />
                 </Grid>
               );
@@ -118,8 +118,8 @@ export async function getServerSideProps(context: any) {
   const {
     group_product_slug,
     p,
-    sort_by,
-    sort_type,
+    sortBy,
+    sortType,
     v_ids,
     min_price,
     max_price,
@@ -129,8 +129,8 @@ export async function getServerSideProps(context: any) {
     product_variants: true,
     ...(p ? { p } : {}),
     ...(group_product_slug ? { group_product_slug } : {}),
-    ...(sort_by ? { sort_by } : {}),
-    ...(sort_type ? { sort_type } : {}),
+    ...(sortBy ? { sortBy } : {}),
+    ...(sortType ? { sortType } : {}),
     ...(v_ids ? { v_ids } : {}),
     ...(min_price ? { min_price } : {}),
     ...(max_price ? { max_price } : {}),

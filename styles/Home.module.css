@@ -3,3 +3,17 @@
   align-items: center;
   justify-content: center;
 }
+.viewAllWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.viewAll {
+  padding: 12px 24px;
+  background-color: var(--logo-bg-color);
+  color: #fff;
+  border-radius: 5px;
+}
+.viewAll:hover {
+  box-shadow: 0 0 1px 1px var(--logo-bg-color);
+}

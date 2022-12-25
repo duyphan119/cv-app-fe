@@ -7,3 +7,4 @@ export { default as ModalProductVariantImage } from "./ModalProductVariantImage"
 export { default as ConfirmDialog } from "./ConfirmDialog";
 export { default as ModalProductVariant } from "./ModalProductVariant";
 export { default as DataManagement } from "./DataManagement";
+export { default as ModalUserAddress } from "./ModalUserAddress";
