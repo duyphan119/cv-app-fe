@@ -6,6 +6,7 @@ import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import TableRowsIcon from "@mui/icons-material/TableRows";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import FeedIcon from "@mui/icons-material/Feed";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -28,12 +29,12 @@ const navItems: NavItem[] = [
     icon: <HomeIcon />,
   },
   {
-    href: "/admin/tai-khoan",
+    href: "/admin/account",
     label: "Tài khoản",
     icon: <AccountBoxIcon />,
   },
   {
-    href: "/admin/don-hang",
+    href: "/admin/order",
     label: "Đơn hàng",
     icon: <LocalShippingIcon />,
   },
@@ -44,14 +45,19 @@ const navItems: NavItem[] = [
     href: "",
     children: [
       {
-        href: "/admin/nhom-san-pham",
+        href: "/admin/group-product",
         label: "Nhóm sản phẩm",
       },
       {
-        href: "/admin/san-pham",
+        href: "/admin/product",
         label: "Sản phẩm",
       },
     ],
+  },
+  {
+    href: "/admin/blog",
+    label: "Bài viết",
+    icon: <FeedIcon />,
   },
   {
     href: "",
@@ -60,15 +66,15 @@ const navItems: NavItem[] = [
     id: "setting",
     children: [
       {
-        href: "/admin/cai-dat/tai-khoan",
+        href: "/admin/setting/profile",
         label: "Tài khoản",
       },
       {
-        href: "/admin/cai-dat/website",
+        href: "/admin/setting/website",
         label: "Website",
       },
       {
-        href: "/admin/cai-dat/doi-mat-khau",
+        href: "/admin/setting/change-password",
         label: "Đổi mật khẩu",
       },
     ],

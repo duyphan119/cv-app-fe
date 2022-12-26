@@ -13,27 +13,27 @@ type Props = {};
 
 const items: any[] = [
   {
-    href: "/tai-khoan",
+    href: "/profile",
     label: "Tài khoản",
     icon: <PersonOutlineOutlinedIcon />,
   },
   {
-    href: "/so-dia-chi",
+    href: "/address",
     label: "Sổ địa chỉ",
     icon: <HomeOutlinedIcon />,
   },
   {
-    href: "/theo-doi-don-hang",
+    href: "/order",
     label: "Theo dõi đơn hàng",
     icon: <LocalShippingOutlinedIcon />,
   },
   {
-    href: "/san-pham-yeu-thich",
+    href: "/favorite",
     label: "Sản phẩm yêu thích",
     icon: <FavoriteBorderOutlinedIcon />,
   },
   {
-    href: "/doi-mat-khau",
+    href: "/change-password",
     label: "Đổi mật khẩu",
     icon: <PasswordOutlinedIcon />,
   },

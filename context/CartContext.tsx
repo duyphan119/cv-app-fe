@@ -33,7 +33,7 @@ const CartWrapper = (props: Props) => {
         if (hasCookie(COOKIE_ACCESSTOKEN_NAME)) {
           const { message, data } = await getCart();
           if (message === MSG_SUCCESS) {
-            setCart(data.items ? data : { ...data, items: [] });
+            setCart(data && data.items ? data : { ...data, items: [] });
           }
         }
         setLoading(false);

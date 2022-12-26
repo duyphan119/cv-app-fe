@@ -54,15 +54,15 @@ const Products = (props: Props) => {
     if (Object.keys(filter).length > 0 && Object.keys(paramsObj).length > 0) {
       if (Object.keys(paramsObj).length > 0)
         router.push(
-          `${window.location.origin}/san-pham/danh-muc/${filter.group_product_slug}?${searchParams}`
+          `${window.location.origin}/product/group-product/${filter.group_product_slug}?${searchParams}`
         );
       else
         router.push(
-          `${window.location.origin}/san-pham/danh-muc/${filter.group_product_slug}`
+          `${window.location.origin}/product/group-product/${filter.group_product_slug}`
         );
     } else {
       router.push(
-        `${window.location.origin}/san-pham/danh-muc/${filter.group_product_slug}`
+        `${window.location.origin}/product/group-product/${filter.group_product_slug}`
       );
     }
   }, [filter]);
@@ -79,7 +79,7 @@ const Products = (props: Props) => {
             label: "Trang chủ",
           },
           {
-            href: "/san-pham",
+            href: "/product",
             label: "Sản phẩm",
           },
         ],

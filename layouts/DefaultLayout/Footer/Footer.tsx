@@ -87,7 +87,7 @@ const Footer = (props: Props) => {
               {groupProducts.map((groupProduct: GroupProduct) => {
                 return (
                   <Grid item xs={6} key={groupProduct.id}>
-                    <Link href={`/san-phan/danh-muc/${groupProduct.slug}`}>
+                    <Link href={`/san-phan/group-product/${groupProduct.slug}`}>
                       {groupProduct.name}
                     </Link>
                   </Grid>

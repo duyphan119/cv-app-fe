@@ -5,9 +5,13 @@ import { getAllProducts } from "../apis/product";
 import { ProductCard } from "../components";
 import { DefaultLayout } from "../layouts";
 import styles from "../styles/Home.module.css";
-import { Product, ResponseItems } from "../utils/types";
+import { Blog, Product, ResponseItems } from "../utils/types";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { getAllBlogs } from "../apis/blog";
+import { GetServerSidePropsContext } from "next";
+import { COOKIE_ACCESSTOKEN_NAME } from "../utils/constants";
+import { formatDateTime } from "../utils/helpers";
 type ProductsProps = {
   products?: Product[];
 };
@@ -23,8 +27,8 @@ const Products = (props: ProductsProps) => {
           );
         })}
         <Grid item xs={12} className={styles.viewAllWrapper}>
-          <Link href="/san-pham" className={styles.viewAll}>
-            Xem tất cả
+          <Link href="/product" className={styles.viewAll}>
+            Xem tất cả sản phẩm
           </Link>
         </Grid>
       </Grid>
@@ -88,10 +92,54 @@ const Banners = (props: BannersProps) => {
   ) : null;
 };
 
+type BlogProps = {
+  blogs: Blog[];
+};
+
+const Blogs = (props: BlogProps) => {
+  console.log(props.blogs);
+  return (
+    <Container maxWidth="lg">
+      <Grid container columnSpacing={2} rowSpacing={2}>
+        {props.blogs.map((blog: Blog) => {
+          return (
+            <Grid item xs={12} md={4} key={blog.id}>
+              <Link
+                href={`/blog/${blog.slug}`}
+                className={styles.blogThumbnail}
+              >
+                <Image
+                  fill={true}
+                  sizes="(max-width: 768px) 1vw"
+                  src={blog.thumbnail}
+                  alt=""
+                  priority={true}
+                />
+              </Link>
+              <Link href={`/blog/${blog.slug}`} className={styles.blogTitle}>
+                {blog.title}
+              </Link>
+              <div className={styles.blogCreatedAt}>
+                {formatDateTime(blog.createdAt)}
+              </div>
+            </Grid>
+          );
+        })}
+        <Grid item xs={12} className={styles.viewAllWrapper}>
+          <Link href="/blog" className={styles.viewAll}>
+            Xem tất cả bài viết
+          </Link>
+        </Grid>
+      </Grid>
+    </Container>
+  );
+};
+
 type Props = {
   productData: ResponseItems<Product>;
+  blogData: ResponseItems<Blog>;
 };
-export default function Home({ productData }: Props) {
+export default function Home({ productData, blogData }: Props) {
   return (
     <DefaultLayout>
       <>
@@ -114,22 +162,43 @@ export default function Home({ productData }: Props) {
               },
             ]}
           />
+
           <h1 className={styles.h1}>Sản phẩm mới</h1>
           <Products products={productData.items} />
+          <h1 className={styles.h1}>Bài viết</h1>
+          <Blogs blogs={blogData.items} />
         </main>
       </>
     </DefaultLayout>
   );
 }
-export async function getServerSideProps() {
-  const { data } = await getAllProducts({
-    limit: 24,
-    product_variants: true,
-    images: true,
-  });
-  return {
-    props: {
-      productData: data,
-    },
-  };
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  try {
+    const [{ data: productData }, { data: blogData }] = await Promise.all([
+      getAllProducts({
+        limit: 24,
+        product_variants: true,
+        images: true,
+      }),
+      getAllBlogs(
+        {
+          limit: 3,
+        },
+        context.req.cookies[COOKIE_ACCESSTOKEN_NAME]
+      ),
+    ]);
+    return {
+      props: {
+        productData,
+        blogData,
+      },
+    };
+  } catch (error) {
+    return {
+      props: {
+        productData: { items: [], count: 0, totalPages: 0 },
+        blogData: { items: [], count: 0, totalPages: 0 },
+      },
+    };
+  }
 }

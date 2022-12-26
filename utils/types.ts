@@ -20,7 +20,14 @@ type Timestamp = {
   createdAt: string;
   updatedAt: string;
 } & Partial<{ deletedAt?: string | null }>;
-
+export type Blog = {
+  id: number;
+  title: string;
+  content: string;
+  slug: string;
+  thumbnail: string;
+  userId: number;
+} & Timestamp;
 export type Product = {
   id: number;
   name: string;

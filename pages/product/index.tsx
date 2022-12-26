@@ -50,19 +50,19 @@ const AllProducts = (props: Props) => {
       if (filter.group_product_slug)
         if (Object.keys(paramsObj).length > 0)
           router.push(
-            `${window.location.origin}/san-pham/danh-muc/${filter.group_product_slug}?${searchParams}`
+            `${window.location.origin}/product/group-product/${filter.group_product_slug}?${searchParams}`
           );
         else
           router.push(
-            `${window.location.origin}/san-pham/danh-muc/${filter.group_product_slug}`
+            `${window.location.origin}/product/group-product/${filter.group_product_slug}`
           );
       else {
         if (Object.keys(paramsObj).length > 0)
-          router.push(`${window.location.origin}/san-pham?${searchParams}`);
-        else router.push(`${window.location.origin}/san-pham`);
+          router.push(`${window.location.origin}/product?${searchParams}`);
+        else router.push(`${window.location.origin}/product`);
       }
     } else {
-      router.push(`${window.location.origin}/san-pham`);
+      router.push(`${window.location.origin}/product`);
     }
   }, [filter]);
   return (

@@ -36,7 +36,7 @@ const HeaderBottom = (props: Props) => {
           </Link>
         </li>
         <li className={styles["nav-item"]}>
-          <Link href="/san-pham" className={styles["nav-item-link"]}>
+          <Link href="/product" className={styles["nav-item-link"]}>
             Sản phẩm
           </Link>
           {groupProducts.length > 0 ? (
@@ -45,7 +45,7 @@ const HeaderBottom = (props: Props) => {
                 return (
                   <li className={styles["menu-item"]} key={groupProduct.id}>
                     <Link
-                      href={`/san-pham/danh-muc/${groupProduct.slug}`}
+                      href={`/product/group-product/${groupProduct.slug}`}
                       className={styles["menu-item-link"]}
                     >
                       {groupProduct.name}

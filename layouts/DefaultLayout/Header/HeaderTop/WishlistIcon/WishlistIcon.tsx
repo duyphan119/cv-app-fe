@@ -11,7 +11,7 @@ const WishlistIcon = (props: Props) => {
   return (
     <>
       <Badge badgeContent={listId.length} color="error">
-        <Link href="/san-pham-yeu-thich">
+        <Link href="/favorite">
           <FavoriteBorderOutlinedIcon />
           YÊU THÍCH
         </Link>

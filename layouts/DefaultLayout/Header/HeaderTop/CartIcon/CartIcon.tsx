@@ -10,7 +10,7 @@ const CartIcon = (props: Props) => {
   return (
     <>
       <Badge badgeContent={count} color="error">
-        <Link href="/gio-hang">
+        <Link href="/cart">
           <ShoppingBagOutlinedIcon />
           GIỎ HÀNG
         </Link>

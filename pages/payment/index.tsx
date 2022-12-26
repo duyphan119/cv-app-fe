@@ -83,7 +83,7 @@ const Payment = (props: Props) => {
       });
       if (message === MSG_SUCCESS) {
         checkout();
-        router.push("/thanh-toan/thanh-cong");
+        router.push("/payment/success");
       }
     } catch (error) {
       console.log(error);
@@ -476,7 +476,7 @@ const Payment = (props: Props) => {
                   </span>
                 </li>
                 <li className={styles.actions}>
-                  <Link href="/gio-hang">Quay lại giỏ hàng</Link>
+                  <Link href="/cart">Quay lại giỏ hàng</Link>
                   <button type="submit">Thanh toán</button>
                 </li>
               </ul>

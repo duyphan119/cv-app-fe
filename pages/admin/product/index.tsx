@@ -222,7 +222,7 @@ const Products = (props: Props) => {
               key: "actions",
               render: (row: Product) => (
                 <div style={{ display: "flex", alignItems: "center" }}>
-                  <Link href={`/admin/san-pham/${row.id}/sua`}>
+                  <Link href={`/admin/product/${row.id}/update`}>
                     <button className="btnEdit">Sửa</button>
                   </Link>
                   <button className="btnDelete" style={{ marginLeft: "8px" }}>

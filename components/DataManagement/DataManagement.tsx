@@ -1,7 +1,7 @@
 import { Box, Pagination, Paper } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { CSSProperties, FormEvent, memo, useState } from "react";
+import { CSSProperties, FormEvent, memo, useState, ChangeEvent } from "react";
 import styles from "./style.module.css";
 
 type SortBy = {
@@ -30,18 +30,33 @@ const DataManagement = (props: Props) => {
   const router = useRouter();
   const { p } = router.query;
   const PAGE = p ? +p : 1;
+  const [q, setQ] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("");
-  const [sortType, setSortType] = useState<string>("asc");
-  const handleSort = (e: FormEvent<HTMLFormElement>) => {
+  const [sortType, setSortType] = useState<string>("desc");
+
+  const handleSearch = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     let obj: any = {
       ...(PAGE && PAGE > 1 ? { p: PAGE } : {}),
-      sortBy: sortBy,
-      sortType: sortType,
+      ...(sortBy ? { sortBy } : {}),
+      ...(sortType && sortType !== "desc" ? { sortType } : {}),
+      ...(q && q !== "" ? { q } : {}),
     };
     let url = new URLSearchParams(obj).toString();
     router.push(`${router.pathname}${url ? "?" : ""}${url}`);
   };
+
+  const handleSort = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    let obj: any = {
+      ...(PAGE && PAGE > 1 ? { p: PAGE } : {}),
+      ...(sortBy ? { sortBy } : {}),
+      ...(sortType && sortType !== "desc" ? { sortType } : {}),
+    };
+    let url = new URLSearchParams(obj).toString();
+    router.push(`${router.pathname}${url ? "?" : ""}${url}`);
+  };
+
   const showRow = (column: Column, row: any, index: number) => {
     if (column.render) {
       return column.render(row);
@@ -51,7 +66,10 @@ const DataManagement = (props: Props) => {
     }
     return row[column.key];
   };
-  const handleChange = (p: number) => {
+  const handleChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
+    setQ(e.target.value);
+  };
+  const handleChangePage = (p: number) => {
     let obj: any = {
       ...(p && p > 1 ? { p } : {}),
       ...(sortBy !== "" ? { sortBy: sortBy, sortType: sortType } : {}),
@@ -64,10 +82,17 @@ const DataManagement = (props: Props) => {
       <div className={styles.paperTitle}>{props.paperTitle || "Tiêu đề"}</div>
       <Box className={styles.actionsWrapper}>
         <Box className={styles.actionsWrapperLeft}>
-          <div className={styles.searchWrapper}>
-            <input type="search" placeholder="Tìm tại đây" />
-            <button className="btnSearch">Tìm</button>
-          </div>
+          <form className={styles.searchWrapper} onSubmit={handleSearch}>
+            <input
+              type="search"
+              value={q}
+              onChange={handleChangeInput}
+              placeholder="Tìm tại đây"
+            />
+            <button type="submit" className="btnSearch">
+              Tìm
+            </button>
+          </form>
           <form className={styles.sortForm} onSubmit={handleSort}>
             <select onChange={(e) => setSortBy(e.target.value)} value={sortBy}>
               <option value="">Sắp xếp theo</option>
@@ -90,7 +115,7 @@ const DataManagement = (props: Props) => {
           </form>
         </Box>
         <Box>
-          <Link href={router.pathname + "/them"}>
+          <Link href={router.pathname + "/create"}>
             <button className="btnAdd">Thêm mới</button>
           </Link>
         </Box>
@@ -167,7 +192,7 @@ const DataManagement = (props: Props) => {
           shape="rounded"
           showLastButton
           showFirstButton
-          onChange={(e, page) => handleChange(page)}
+          onChange={(e, page) => handleChangePage(page)}
           color="primary"
         />
       ) : null}

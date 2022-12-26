@@ -34,7 +34,7 @@ const Drawer = (props: Props) => {
               <Link href="/">Trang chủ</Link>
             </li>
             <li className={styles["nav-item"]}>
-              <Link href="/gio-hang">Giỏ hàng</Link>
+              <Link href="/cart">Giỏ hàng</Link>
             </li>
           </ul>
         </nav>

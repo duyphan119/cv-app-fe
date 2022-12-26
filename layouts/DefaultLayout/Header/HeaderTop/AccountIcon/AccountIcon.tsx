@@ -15,7 +15,7 @@ const AccountIcon = (props: Props) => {
   };
 
   return isLogged ? (
-    <Link href="/tai-khoan">
+    <Link href="/profile">
       <AccountCircleOutlinedIcon />
       TÀI KHOẢN
     </Link>

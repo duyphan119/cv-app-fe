@@ -36,7 +36,7 @@ const Header = (props: Props) => {
             <ChatBubbleOutlineIcon className={styles.icon} />
           </Badge>
         </span>
-        <Link href="/admin/thong-tin-tai-khoan">
+        <Link href="/admin/profile">
           Xin chào, <strong>Duy Phan</strong>
         </Link>
       </div>

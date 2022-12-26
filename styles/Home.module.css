@@ -17,3 +17,25 @@
 .viewAll:hover {
   box-shadow: 0 0 1px 1px var(--logo-bg-color);
 }
+.blogThumbnail {
+  position: relative;
+  min-height: 280px;
+  overflow: hidden;
+  display: block;
+}
+.blogTitle {
+  font-weight: 600;
+  padding: 8px 0;
+  font-size: 20px;
+  display: block;
+}
+.blogCreatedAt {
+  color: gray;
+}
+.blogThumbnail:hover + .blogTitle,
+.blogTitle:hover {
+  color: var(--logo-bg-color);
+}
+.blogThumbnail:hover img {
+  transform: scale(1.01);
+}

@@ -25,7 +25,7 @@ const AdminLayout = (props: Props) => {
           const { message, data } = await getProfile();
           if (message !== MSG_SUCCESS) {
             if (router.pathname.includes("/admin"))
-              router.push("/admin/dang-nhap");
+              router.push("/admin/signin");
             changeProfile(null);
           } else {
             setIsLogged(true);
@@ -33,7 +33,7 @@ const AdminLayout = (props: Props) => {
           }
         }
       } catch (error) {
-        if (router.pathname.includes("/admin")) router.push("/admin/dang-nhap");
+        if (router.pathname.includes("/admin")) router.push("/admin/signin");
         changeProfile(null);
       }
     })();

@@ -2,7 +2,7 @@ import type { AppProps } from "next/app";
 import NextNProgress from "nextjs-progressbar";
 import "swiper/css";
 import "swiper/css/pagination";
-import { ScrollToTop } from "../components";
+import { Facebook, ScrollToTop } from "../components";
 import AuthWrapper from "../context/AuthContext";
 import CartWrapper from "../context/CartContext";
 import GroupProductWrapper from "../context/GroupProductContext";
@@ -25,7 +25,7 @@ function App({ Component, pageProps }: AppProps) {
                 height={3}
                 showOnShallow={true}
               />
-              {/* <Facebook /> */}
+              <Facebook />
               <Component {...pageProps} />
             </GroupProductWrapper>
           </AuthWrapper>

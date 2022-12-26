@@ -91,7 +91,7 @@ const ProductCard = (props: Props) => {
         <Link
           className={styles.thumbnail}
           href={{
-            pathname: "/san-pham/[slug]",
+            pathname: "/product/[slug]",
             query: {
               slug: props.product.slug,
             },
@@ -124,7 +124,7 @@ const ProductCard = (props: Props) => {
       <div className={styles["name-wrapper"]}>
         <Link
           href={{
-            pathname: "/san-pham/[slug]",
+            pathname: "/product/[slug]",
             query: {
               slug: props.product.slug,
             },

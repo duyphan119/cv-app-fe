@@ -51,7 +51,7 @@ const CartItem = React.memo((props: CartItemProps) => {
           <div>
             <Link
               href={{
-                pathname: "/san-pham/[slug]",
+                pathname: "/product/[slug]",
                 query: { slug: props.item.product?.slug },
               }}
             >
@@ -126,7 +126,7 @@ const CartResult = () => {
         <span>Tổng cộng</span>
         <span>{total}</span>
       </div>
-      <Link href="/thanh-toan" className={styles.checkout}>
+      <Link href="/payment" className={styles.checkout}>
         Thanh toán
       </Link>
     </div>
@@ -146,7 +146,7 @@ const EmptyCart = () => {
         />
       </div>
       <p>Giỏ hàng của bạn đang trống</p>
-      <Link href="/san-pham">Xem tất cả sản phẩm</Link>
+      <Link href="/product">Xem tất cả sản phẩm</Link>
     </div>
   );
 };

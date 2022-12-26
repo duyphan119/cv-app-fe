@@ -82,7 +82,7 @@ const SearchInput = (props: Props) => {
                 return (
                   <li key={product.id}>
                     <Link
-                      href={`/san-pham/${product.slug}`}
+                      href={`/product/${product.slug}`}
                       className={styles.link}
                     >
                       <Image
